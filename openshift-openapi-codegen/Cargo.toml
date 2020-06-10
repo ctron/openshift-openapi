@@ -17,4 +17,4 @@ serde_derive = "1"
 k8s-openapi-codegen-common = { version = "0.8", features = ["serde"] }
 
 [patch.crates-io]
-k8s-openapi-codegen-common = { git = "https://github.com/ctron/k8s-openapi", branch = "feature/openshift_api_1" }
+k8s-openapi-codegen-common = { git = "https://github.com/ctron/k8s-openapi", branch = "feature/openshift_api_2" }

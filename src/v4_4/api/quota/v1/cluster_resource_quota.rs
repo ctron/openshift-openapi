@@ -563,14 +563,6 @@ impl k8s_openapi::Metadata for ClusterResourceQuota {
     fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
         Some(&self.metadata)
     }
-
-    fn metadata_mut(&mut self) -> Option<&mut<Self as k8s_openapi::Metadata>::Ty> {
-        Some(&mut self.metadata)
-    }
-
-    fn set_metadata(&mut self, metadata: <Self as k8s_openapi::Metadata>::Ty) {
-        self.metadata = metadata;
-    }
 }
 
 impl<'de> serde::Deserialize<'de> for ClusterResourceQuota {

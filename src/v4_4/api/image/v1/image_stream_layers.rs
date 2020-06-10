@@ -124,14 +124,6 @@ impl k8s_openapi::Metadata for ImageStreamLayers {
     fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
         self.metadata.as_ref()
     }
-
-    fn metadata_mut(&mut self) -> Option<&mut<Self as k8s_openapi::Metadata>::Ty> {
-        self.metadata.as_mut()
-    }
-
-    fn set_metadata(&mut self, metadata: <Self as k8s_openapi::Metadata>::Ty) {
-        self.metadata = Some(metadata);
-    }
 }
 
 impl<'de> serde::Deserialize<'de> for ImageStreamLayers {
