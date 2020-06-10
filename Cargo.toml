@@ -1,0 +1,40 @@
+[package]
+name = "openshift-openapi"
+license = "Apache-2.0"
+categories = ["api-bindings", "web-programming::http-client"]
+description = "Bindings for the OpenShift client API"
+version = "0.0.1"
+authors = ["Jens Reimann <jreimann@redhat.com>"]
+edition = "2018"
+keywords = ["client", "kubernetes", "k8s", "openshift", "http"]
+readme = "README.md"
+repository = "https://github.com/ctron/openshift-openapi"
+
+[dependencies]
+
+k8s-openapi = { version = "0.8" }
+
+base64 = "0.12"
+bytes = "0.5"
+chrono = { version = "0.4", features = ["serde"] }
+http = { version = "0.2", optional = true }
+percent-encoding = { version = "2", optional = true }
+serde = "1"
+serde_json = "1"
+serde-value = "0.6"
+url = { version = "2", optional = true }
+
+[features]
+
+default = ["api"]
+
+api = ["http", "percent-encoding", "url"]
+
+# Each feature corresponds to a supported version of Openshift and Kubernetes
+v4_4 = [ "k8s-openapi/v1_17" ]
+
+[patch.crates-io]
+k8s-openapi = { git = "https://github.com/ctron/k8s-openapi", branch="feature/openshift_api_1" }
+
+[package.metadata.docs.rs]
+features = ["v4_4"]

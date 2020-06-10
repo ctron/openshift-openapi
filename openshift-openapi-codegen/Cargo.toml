@@ -1,0 +1,20 @@
+[package]
+name = "openshift-openapi-codegen"
+version = "0.1.0"
+authors = ["Jens Reimann <jreimann@redhat.com>"]
+edition = "2018"
+
+[dependencies]
+
+backtrace = "0.3"
+env_logger = "0.7"
+http = "0.2"
+log = "0.4"
+reqwest = { version = "0.10", features = ["blocking", "json"] }
+serde = "1"
+serde_derive = "1"
+
+k8s-openapi-codegen-common = { version = "0.8", features = ["serde"] }
+
+[patch.crates-io]
+k8s-openapi-codegen-common = { git = "https://github.com/ctron/k8s-openapi", branch = "feature/openshift_api_1" }
