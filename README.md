@@ -1,5 +1,6 @@
 # OpenShift API for Rust
 
+![CI](https://github.com/ctron/openshift-openapi/workflows/CI/badge.svg)
 [![Crates.io version shield](https://img.shields.io/crates/v/openshift-openapi.svg)](https://crates.io/crates/openshift-openapi)
 [![Docs](https://docs.rs/openshift-openapi/badge.svg)](https://docs.rs/openshift-openapi)
 [![Crates.io license shield](https://img.shields.io/crates/l/openshift-openapi.svg)](https://crates.io/crates/openshift-openapi)
