@@ -4,7 +4,7 @@
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct ImageSource {
     /// A list of image names that this source will be used in place of during a multi-stage container image build. For instance, a Dockerfile that uses "COPY --from=nginx:latest" will first check for an image source that has "nginx:latest" in this field before attempting to pull directly. If the Dockerfile does not reference an image source it is ignored. This field and paths may both be set, in which case the contents will be used twice.
-    pub r#as: Option<Vec<String>>,
+    pub as_: Option<Vec<String>>,
 
     /// from is a reference to an ImageStreamTag, ImageStreamImage, or DockerImage to copy source from.
     pub from: k8s_openapi::api::core::v1::ObjectReference,
@@ -20,7 +20,7 @@ impl<'de> serde::Deserialize<'de> for ImageSource {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: serde::Deserializer<'de> {
         #[allow(non_camel_case_types)]
         enum Field {
-            Key_as,
+            Key_as_,
             Key_from,
             Key_paths,
             Key_pull_secret,
@@ -40,7 +40,7 @@ impl<'de> serde::Deserialize<'de> for ImageSource {
 
                     fn visit_str<E>(self, v: &str) -> Result<Self::Value, E> where E: serde::de::Error {
                         Ok(match v {
-                            "as" => Field::Key_as,
+                            "as" => Field::Key_as_,
                             "from" => Field::Key_from,
                             "paths" => Field::Key_paths,
                             "pullSecret" => Field::Key_pull_secret,
@@ -63,14 +63,14 @@ impl<'de> serde::Deserialize<'de> for ImageSource {
             }
 
             fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error> where A: serde::de::MapAccess<'de> {
-                let mut value_as: Option<Vec<String>> = None;
+                let mut value_as_: Option<Vec<String>> = None;
                 let mut value_from: Option<k8s_openapi::api::core::v1::ObjectReference> = None;
                 let mut value_paths: Option<Vec<crate::api::build::v1::ImageSourcePath>> = None;
                 let mut value_pull_secret: Option<k8s_openapi::api::core::v1::LocalObjectReference> = None;
 
                 while let Some(key) = serde::de::MapAccess::next_key::<Field>(&mut map)? {
                     match key {
-                        Field::Key_as => value_as = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_as_ => value_as_ = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_from => value_from = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_paths => value_paths = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_pull_secret => value_pull_secret = serde::de::MapAccess::next_value(&mut map)?,
@@ -79,7 +79,7 @@ impl<'de> serde::Deserialize<'de> for ImageSource {
                 }
 
                 Ok(ImageSource {
-                    r#as: value_as,
+                    as_: value_as_,
                     from: value_from.ok_or_else(|| serde::de::Error::missing_field("from"))?,
                     paths: value_paths,
                     pull_secret: value_pull_secret,
@@ -105,11 +105,11 @@ impl serde::Serialize for ImageSource {
         let mut state = serializer.serialize_struct(
             "ImageSource",
             1 +
-            self.r#as.as_ref().map_or(0, |_| 1) +
+            self.as_.as_ref().map_or(0, |_| 1) +
             self.paths.as_ref().map_or(0, |_| 1) +
             self.pull_secret.as_ref().map_or(0, |_| 1),
         )?;
-        if let Some(value) = &self.r#as {
+        if let Some(value) = &self.as_ {
             serde::ser::SerializeStruct::serialize_field(&mut state, "as", value)?;
         }
         serde::ser::SerializeStruct::serialize_field(&mut state, "from", &self.from)?;

@@ -3,7 +3,7 @@ name = "openshift-openapi"
 license = "Apache-2.0"
 categories = ["api-bindings", "web-programming::http-client"]
 description = "Bindings for the OpenShift client API"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Jens Reimann <jreimann@redhat.com>"]
 edition = "2018"
 keywords = ["client", "kubernetes", "k8s", "openshift", "http"]
@@ -30,7 +30,7 @@ default = ["api"]
 
 api = ["http", "percent-encoding", "url"]
 
-# Each feature corresponds to a supported version of Openshift and Kubernetes
+# Each feature corresponds to a supported version of OpenShift and Kubernetes
 v4_4 = [ "k8s-openapi/v1_17" ]
 
 [patch.crates-io]

@@ -4,14 +4,14 @@
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct TemplateInstanceObject {
     /// ref is a reference to the created object.  When used under .spec, only name and namespace are used; these can contain references to parameters which will be substituted following the usual rules.
-    pub r#ref: Option<k8s_openapi::api::core::v1::ObjectReference>,
+    pub ref_: Option<k8s_openapi::api::core::v1::ObjectReference>,
 }
 
 impl<'de> serde::Deserialize<'de> for TemplateInstanceObject {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: serde::Deserializer<'de> {
         #[allow(non_camel_case_types)]
         enum Field {
-            Key_ref,
+            Key_ref_,
             Other,
         }
 
@@ -28,7 +28,7 @@ impl<'de> serde::Deserialize<'de> for TemplateInstanceObject {
 
                     fn visit_str<E>(self, v: &str) -> Result<Self::Value, E> where E: serde::de::Error {
                         Ok(match v {
-                            "ref" => Field::Key_ref,
+                            "ref" => Field::Key_ref_,
                             _ => Field::Other,
                         })
                     }
@@ -48,17 +48,17 @@ impl<'de> serde::Deserialize<'de> for TemplateInstanceObject {
             }
 
             fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error> where A: serde::de::MapAccess<'de> {
-                let mut value_ref: Option<k8s_openapi::api::core::v1::ObjectReference> = None;
+                let mut value_ref_: Option<k8s_openapi::api::core::v1::ObjectReference> = None;
 
                 while let Some(key) = serde::de::MapAccess::next_key::<Field>(&mut map)? {
                     match key {
-                        Field::Key_ref => value_ref = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_ref_ => value_ref_ = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Other => { let _: serde::de::IgnoredAny = serde::de::MapAccess::next_value(&mut map)?; },
                     }
                 }
 
                 Ok(TemplateInstanceObject {
-                    r#ref: value_ref,
+                    ref_: value_ref_,
                 })
             }
         }
@@ -77,9 +77,9 @@ impl serde::Serialize for TemplateInstanceObject {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct(
             "TemplateInstanceObject",
-            self.r#ref.as_ref().map_or(0, |_| 1),
+            self.ref_.as_ref().map_or(0, |_| 1),
         )?;
-        if let Some(value) = &self.r#ref {
+        if let Some(value) = &self.ref_ {
             serde::ser::SerializeStruct::serialize_field(&mut state, "ref", value)?;
         }
         serde::ser::SerializeStruct::end(state)

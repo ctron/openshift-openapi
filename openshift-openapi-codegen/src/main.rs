@@ -123,8 +123,7 @@ fn main() -> Result<(), Error> {
     result
 }
 
-struct OpenshiftCrateRooter {
-}
+struct OpenshiftCrateRooter {}
 
 impl CrateRooter for OpenshiftCrateRooter {
     fn root(&self, namespace: &Vec<&str>) -> String {
@@ -163,7 +162,7 @@ fn run(
         (&["io".into(), "k8s".into()], &[]),
     ];
 
-    let crate_root =  OpenshiftCrateRooter{};
+    let crate_root = OpenshiftCrateRooter {};
 
     let mut num_generated_structs = 0usize;
     let mut num_generated_type_aliases = 0usize;
@@ -194,7 +193,12 @@ fn run(
 
     log::info!("Dropping non-OpenShift types...");
 
-    spec.operations.retain(|op| op.tag.contains("Openshift"));
+    spec.operations.retain(|op| {
+        op.tag
+            .as_ref()
+            .map(|t| t.contains("Openshift"))
+            .unwrap_or(false)
+    });
 
     let expected_num_generated_types: usize = spec.definitions.len();
     let expected_num_generated_apis: usize = spec.operations.len();
@@ -355,8 +359,8 @@ fn run(
         spec.operations.sort_by(|o1, o2| o1.id.cmp(&o2.id));
         for operation in spec.operations {
             if let Some(swagger20::KubernetesGroupKindVersion {
-                group:_,
-                kind:_,
+                group: _,
+                kind: _,
                 version: _,
             }) = operation.kubernetes_group_kind_version
             {
