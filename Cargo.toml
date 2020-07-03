@@ -31,6 +31,7 @@ default = ["api"]
 api = ["http", "percent-encoding", "url"]
 
 # Each feature corresponds to a supported version of OpenShift and Kubernetes
+v4_3 = [ "k8s-openapi/v1_16" ]
 v4_4 = [ "k8s-openapi/v1_17" ]
 
 [patch.crates-io]

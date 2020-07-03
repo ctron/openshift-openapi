@@ -14,9 +14,13 @@
     clippy::use_self
 )]
 
-//! Bindings for the Kubernetes client API, generated from the OpenAPI spec.
+//! Bindings for the OpenShift client API, generated from the OpenAPI spec.
 //!
-//! Each supported version of Kubernetes is represented by a feature name (like `v1_9`). Only one such feature can be enabled at a time.
+//! Each supported version of OpenShift is represented by a feature name (like `v4_4`). Only one such feature can be enabled at a time.
+//! As this crate depends on the other Kubernetes APIs, it references the `k8s_openapi` crate for
+//! these types. Selecting a supported version for OpenShift (like `v4_4`) will automatically
+//! select the corresponding Kubernetes feature on the `k8s_openapi` crate. So for OpenShift
+//! `v4_4` it will automatically enable the feature `k8s_openapi/v1_17`.
 //!
 //! These docs have been generated with the `
 
@@ -208,9 +212,9 @@
 //!
 //! # Crate features
 //!
-//! - This crate contains several `v1_*` features. Enabling one of the `v1_*` features selects which version of the Kubernetes API server this crate should target.
-//!   For example, enabling the `v1_16` feature means the crate will only contain the API exposed by Kubernetes 1.16. It will not expose API
-//!   that were removed in 1.16 or earlier, nor any API added in 1.17 or later.
+//! - This crate contains several `v4_*` features. Enabling one of the `v4_*` features selects which version of the Kubernetes API server this crate should target.
+//!   For example, enabling the `v4_3` feature means the crate will only contain the API exposed by OpenShift 4.3. It will not expose API
+//!   that were removed in 4.3 or earlier, nor any API added in 4.4 or later.
 //!
 //! - The crate also contains a feature named `api`. If this feature is disabled, the library will only contain the resource types like [`api::core::v1::Pod`],
 //!   and not the associated operation functions like [`api::core::v1::Pod::read_namespaced_pod`]. The `Response` and `Optional` types for the operation functions
@@ -450,6 +454,11 @@
 pub use chrono;
 pub use serde_json;
 pub use serde_value;
+
+#[cfg(feature = "v4_3")]
+mod v4_3;
+#[cfg(feature = "v4_3")]
+pub use self::v4_3::*;
 
 #[cfg(feature = "v4_4")]
 mod v4_4;
