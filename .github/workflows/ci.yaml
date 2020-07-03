@@ -18,7 +18,7 @@ jobs:
           - "stable"
           - "beta"
           - "nightly"
-          - "1.44"
+          - "1.44.0"
         api-version:
           - "v4_3"
           - "v4_4"
