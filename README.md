@@ -8,7 +8,10 @@ This crate is a Rust OpenShift API client. It contains bindings for the
 resources and operations in the OpenShift client API,
 auto-generated from the OpenAPI spec.
 
-This work is based on the wonderful work from https://github.com/Arnavion/k8s-openapi
+This work is based on the wonderful work from https://github.com/Arnavion/k8s-openapi. It does not contain
+the Kubernetes APIs, that is handled by the `k8s_openapi` crate. It only contains the types added by OpenShift
+(like `Route` and `ImageStream`) and references the existing Kubernetes (like `Pod` and `Deployment`) from the
+`k8s_openapi` crate.
 
 **Note**: This currently uses a patched version `k8s-openapi`. A few changes to the
 code generator had been necessary. This is currently being tracked in PR https://github.com/Arnavion/k8s-openapi/pull/68.
