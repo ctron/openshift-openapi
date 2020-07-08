@@ -53,7 +53,7 @@ pub struct SecurityContextConstraints {
     pub groups: Option<Vec<String>>,
 
     /// Standard object's metadata. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#metadata
-    pub metadata: Option<k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta>,
+    pub metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta,
 
     /// Priority influences the sort order of SCCs when evaluating which SCCs to try first for a given pod request based on access in the Users and Groups fields.  The higher the int, the higher priority. An unset value is considered a 0 priority. If scores for multiple SCCs are equal they will be sorted from most restrictive to least restrictive. If both priorities and restrictions are equal the SCCs will be sorted by name.
     pub priority: i32,
@@ -456,8 +456,12 @@ impl k8s_openapi::ListableResource for SecurityContextConstraints {
 impl k8s_openapi::Metadata for SecurityContextConstraints {
     type Ty = k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
-    fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
-        self.metadata.as_ref()
+    fn metadata(&self) -> &<Self as k8s_openapi::Metadata>::Ty {
+        &self.metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+        &mut self.metadata
     }
 }
 
@@ -609,7 +613,7 @@ impl<'de> serde::Deserialize<'de> for SecurityContextConstraints {
                         Field::Key_forbidden_sysctls => value_forbidden_sysctls = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_fs_group => value_fs_group = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_groups => value_groups = serde::de::MapAccess::next_value(&mut map)?,
-                        Field::Key_metadata => value_metadata = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_metadata => value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_priority => value_priority = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_read_only_root_filesystem => value_read_only_root_filesystem = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_required_drop_capabilities => value_required_drop_capabilities = Some(serde::de::MapAccess::next_value(&mut map)?),
@@ -639,7 +643,7 @@ impl<'de> serde::Deserialize<'de> for SecurityContextConstraints {
                     forbidden_sysctls: value_forbidden_sysctls,
                     fs_group: value_fs_group,
                     groups: value_groups,
-                    metadata: value_metadata,
+                    metadata: value_metadata.ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
                     priority: value_priority.ok_or_else(|| serde::de::Error::missing_field("priority"))?,
                     read_only_root_filesystem: value_read_only_root_filesystem.ok_or_else(|| serde::de::Error::missing_field("readOnlyRootFilesystem"))?,
                     required_drop_capabilities: value_required_drop_capabilities.ok_or_else(|| serde::de::Error::missing_field("requiredDropCapabilities"))?,
@@ -693,7 +697,7 @@ impl serde::Serialize for SecurityContextConstraints {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            14 +
+            15 +
             self.allow_privilege_escalation.as_ref().map_or(0, |_| 1) +
             self.allowed_flex_volumes.as_ref().map_or(0, |_| 1) +
             self.allowed_unsafe_sysctls.as_ref().map_or(0, |_| 1) +
@@ -701,7 +705,6 @@ impl serde::Serialize for SecurityContextConstraints {
             self.forbidden_sysctls.as_ref().map_or(0, |_| 1) +
             self.fs_group.as_ref().map_or(0, |_| 1) +
             self.groups.as_ref().map_or(0, |_| 1) +
-            self.metadata.as_ref().map_or(0, |_| 1) +
             self.run_as_user.as_ref().map_or(0, |_| 1) +
             self.se_linux_context.as_ref().map_or(0, |_| 1) +
             self.seccomp_profiles.as_ref().map_or(0, |_| 1) +
@@ -739,9 +742,7 @@ impl serde::Serialize for SecurityContextConstraints {
         if let Some(value) = &self.groups {
             serde::ser::SerializeStruct::serialize_field(&mut state, "groups", value)?;
         }
-        if let Some(value) = &self.metadata {
-            serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", value)?;
-        }
+        serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", &self.metadata)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "priority", &self.priority)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "readOnlyRootFilesystem", &self.read_only_root_filesystem)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "requiredDropCapabilities", &self.required_drop_capabilities)?;

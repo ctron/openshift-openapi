@@ -7,7 +7,7 @@ pub struct ImageStreamMapping {
     pub image: crate::api::image::v1::Image,
 
     /// Standard object's metadata.
-    pub metadata: Option<k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta>,
+    pub metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta,
 
     /// Tag is a string value this image can be located with inside the stream.
     pub tag: String,
@@ -68,8 +68,12 @@ impl k8s_openapi::Resource for ImageStreamMapping {
 impl k8s_openapi::Metadata for ImageStreamMapping {
     type Ty = k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
-    fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
-        self.metadata.as_ref()
+    fn metadata(&self) -> &<Self as k8s_openapi::Metadata>::Ty {
+        &self.metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+        &mut self.metadata
     }
 }
 
@@ -141,7 +145,7 @@ impl<'de> serde::Deserialize<'de> for ImageStreamMapping {
                             }
                         },
                         Field::Key_image => value_image = Some(serde::de::MapAccess::next_value(&mut map)?),
-                        Field::Key_metadata => value_metadata = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_metadata => value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_tag => value_tag = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Other => { let _: serde::de::IgnoredAny = serde::de::MapAccess::next_value(&mut map)?; },
                     }
@@ -149,7 +153,7 @@ impl<'de> serde::Deserialize<'de> for ImageStreamMapping {
 
                 Ok(ImageStreamMapping {
                     image: value_image.ok_or_else(|| serde::de::Error::missing_field("image"))?,
-                    metadata: value_metadata,
+                    metadata: value_metadata.ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
                     tag: value_tag.ok_or_else(|| serde::de::Error::missing_field("tag"))?,
                 })
             }
@@ -173,15 +177,12 @@ impl serde::Serialize for ImageStreamMapping {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            4 +
-            self.metadata.as_ref().map_or(0, |_| 1),
+            5,
         )?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "apiVersion", <Self as k8s_openapi::Resource>::API_VERSION)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "kind", <Self as k8s_openapi::Resource>::KIND)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "image", &self.image)?;
-        if let Some(value) = &self.metadata {
-            serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", value)?;
-        }
+        serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", &self.metadata)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "tag", &self.tag)?;
         serde::ser::SerializeStruct::end(state)
     }

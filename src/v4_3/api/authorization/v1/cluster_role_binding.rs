@@ -7,7 +7,7 @@ pub struct ClusterRoleBinding {
     pub group_names: Vec<String>,
 
     /// Standard object's metadata.
-    pub metadata: Option<k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta>,
+    pub metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta,
 
     /// RoleRef can only reference the current namespace and the global namespace. If the ClusterRoleRef cannot be resolved, the Authorizer must return an error. Since Policy is a singleton, this is sufficient knowledge to locate a role.
     pub role_ref: k8s_openapi::api::core::v1::ObjectReference,
@@ -344,8 +344,12 @@ impl k8s_openapi::ListableResource for ClusterRoleBinding {
 impl k8s_openapi::Metadata for ClusterRoleBinding {
     type Ty = k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
-    fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
-        self.metadata.as_ref()
+    fn metadata(&self) -> &<Self as k8s_openapi::Metadata>::Ty {
+        &self.metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+        &mut self.metadata
     }
 }
 
@@ -423,7 +427,7 @@ impl<'de> serde::Deserialize<'de> for ClusterRoleBinding {
                             }
                         },
                         Field::Key_group_names => value_group_names = Some(serde::de::MapAccess::next_value(&mut map)?),
-                        Field::Key_metadata => value_metadata = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_metadata => value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_role_ref => value_role_ref = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_subjects => value_subjects = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_user_names => value_user_names = Some(serde::de::MapAccess::next_value(&mut map)?),
@@ -433,7 +437,7 @@ impl<'de> serde::Deserialize<'de> for ClusterRoleBinding {
 
                 Ok(ClusterRoleBinding {
                     group_names: value_group_names.ok_or_else(|| serde::de::Error::missing_field("groupNames"))?,
-                    metadata: value_metadata,
+                    metadata: value_metadata.ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
                     role_ref: value_role_ref.ok_or_else(|| serde::de::Error::missing_field("roleRef"))?,
                     subjects: value_subjects.ok_or_else(|| serde::de::Error::missing_field("subjects"))?,
                     user_names: value_user_names.ok_or_else(|| serde::de::Error::missing_field("userNames"))?,
@@ -461,15 +465,12 @@ impl serde::Serialize for ClusterRoleBinding {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            6 +
-            self.metadata.as_ref().map_or(0, |_| 1),
+            7,
         )?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "apiVersion", <Self as k8s_openapi::Resource>::API_VERSION)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "kind", <Self as k8s_openapi::Resource>::KIND)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "groupNames", &self.group_names)?;
-        if let Some(value) = &self.metadata {
-            serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", value)?;
-        }
+        serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", &self.metadata)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "roleRef", &self.role_ref)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "subjects", &self.subjects)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "userNames", &self.user_names)?;

@@ -16,7 +16,7 @@ pub struct HostSubnet {
     pub host_ip: String,
 
     /// Standard object's metadata.
-    pub metadata: Option<k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta>,
+    pub metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta,
 
     /// Subnet is the CIDR range of the overlay network assigned to the node for its pods
     pub subnet: String,
@@ -395,8 +395,12 @@ impl k8s_openapi::ListableResource for HostSubnet {
 impl k8s_openapi::Metadata for HostSubnet {
     type Ty = k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
-    fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
-        self.metadata.as_ref()
+    fn metadata(&self) -> &<Self as k8s_openapi::Metadata>::Ty {
+        &self.metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+        &mut self.metadata
     }
 }
 
@@ -480,7 +484,7 @@ impl<'de> serde::Deserialize<'de> for HostSubnet {
                         Field::Key_egress_i_ps => value_egress_i_ps = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_host => value_host = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_host_ip => value_host_ip = Some(serde::de::MapAccess::next_value(&mut map)?),
-                        Field::Key_metadata => value_metadata = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_metadata => value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_subnet => value_subnet = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Other => { let _: serde::de::IgnoredAny = serde::de::MapAccess::next_value(&mut map)?; },
                     }
@@ -491,7 +495,7 @@ impl<'de> serde::Deserialize<'de> for HostSubnet {
                     egress_i_ps: value_egress_i_ps,
                     host: value_host.ok_or_else(|| serde::de::Error::missing_field("host"))?,
                     host_ip: value_host_ip.ok_or_else(|| serde::de::Error::missing_field("hostIP"))?,
-                    metadata: value_metadata,
+                    metadata: value_metadata.ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
                     subnet: value_subnet.ok_or_else(|| serde::de::Error::missing_field("subnet"))?,
                 })
             }
@@ -518,10 +522,9 @@ impl serde::Serialize for HostSubnet {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            5 +
+            6 +
             self.egress_cid_rs.as_ref().map_or(0, |_| 1) +
-            self.egress_i_ps.as_ref().map_or(0, |_| 1) +
-            self.metadata.as_ref().map_or(0, |_| 1),
+            self.egress_i_ps.as_ref().map_or(0, |_| 1),
         )?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "apiVersion", <Self as k8s_openapi::Resource>::API_VERSION)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "kind", <Self as k8s_openapi::Resource>::KIND)?;
@@ -533,9 +536,7 @@ impl serde::Serialize for HostSubnet {
         }
         serde::ser::SerializeStruct::serialize_field(&mut state, "host", &self.host)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "hostIP", &self.host_ip)?;
-        if let Some(value) = &self.metadata {
-            serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", value)?;
-        }
+        serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", &self.metadata)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "subnet", &self.subnet)?;
         serde::ser::SerializeStruct::end(state)
     }

@@ -4,7 +4,7 @@
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct TemplateInstance {
     /// Standard object metadata.
-    pub metadata: Option<k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta>,
+    pub metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta,
 
     /// spec describes the desired state of this TemplateInstance.
     pub spec: crate::api::template::v1::TemplateInstanceSpec,
@@ -694,8 +694,12 @@ impl k8s_openapi::ListableResource for TemplateInstance {
 impl k8s_openapi::Metadata for TemplateInstance {
     type Ty = k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
-    fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
-        self.metadata.as_ref()
+    fn metadata(&self) -> &<Self as k8s_openapi::Metadata>::Ty {
+        &self.metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+        &mut self.metadata
     }
 }
 
@@ -766,7 +770,7 @@ impl<'de> serde::Deserialize<'de> for TemplateInstance {
                                 return Err(serde::de::Error::invalid_value(serde::de::Unexpected::Str(&value_kind), &<Self::Value as k8s_openapi::Resource>::KIND));
                             }
                         },
-                        Field::Key_metadata => value_metadata = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_metadata => value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_spec => value_spec = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_status => value_status = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Other => { let _: serde::de::IgnoredAny = serde::de::MapAccess::next_value(&mut map)?; },
@@ -774,7 +778,7 @@ impl<'de> serde::Deserialize<'de> for TemplateInstance {
                 }
 
                 Ok(TemplateInstance {
-                    metadata: value_metadata,
+                    metadata: value_metadata.ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
                     spec: value_spec.ok_or_else(|| serde::de::Error::missing_field("spec"))?,
                     status: value_status.ok_or_else(|| serde::de::Error::missing_field("status"))?,
                 })
@@ -799,14 +803,11 @@ impl serde::Serialize for TemplateInstance {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            4 +
-            self.metadata.as_ref().map_or(0, |_| 1),
+            5,
         )?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "apiVersion", <Self as k8s_openapi::Resource>::API_VERSION)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "kind", <Self as k8s_openapi::Resource>::KIND)?;
-        if let Some(value) = &self.metadata {
-            serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", value)?;
-        }
+        serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", &self.metadata)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "spec", &self.spec)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "status", &self.status)?;
         serde::ser::SerializeStruct::end(state)

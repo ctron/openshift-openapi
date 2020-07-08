@@ -10,7 +10,7 @@ pub struct ClusterNetwork {
     pub hostsubnetlength: Option<i64>,
 
     /// Standard object's metadata.
-    pub metadata: Option<k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta>,
+    pub metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta,
 
     /// Network is a CIDR string specifying the global overlay network's L3 space
     pub network: Option<String>,
@@ -398,8 +398,12 @@ impl k8s_openapi::ListableResource for ClusterNetwork {
 impl k8s_openapi::Metadata for ClusterNetwork {
     type Ty = k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
-    fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
-        self.metadata.as_ref()
+    fn metadata(&self) -> &<Self as k8s_openapi::Metadata>::Ty {
+        &self.metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+        &mut self.metadata
     }
 }
 
@@ -484,7 +488,7 @@ impl<'de> serde::Deserialize<'de> for ClusterNetwork {
                         },
                         Field::Key_cluster_networks => value_cluster_networks = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_hostsubnetlength => value_hostsubnetlength = serde::de::MapAccess::next_value(&mut map)?,
-                        Field::Key_metadata => value_metadata = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_metadata => value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_network => value_network = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_plugin_name => value_plugin_name = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_service_network => value_service_network = Some(serde::de::MapAccess::next_value(&mut map)?),
@@ -496,7 +500,7 @@ impl<'de> serde::Deserialize<'de> for ClusterNetwork {
                 Ok(ClusterNetwork {
                     cluster_networks: value_cluster_networks.ok_or_else(|| serde::de::Error::missing_field("clusterNetworks"))?,
                     hostsubnetlength: value_hostsubnetlength,
-                    metadata: value_metadata,
+                    metadata: value_metadata.ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
                     network: value_network,
                     plugin_name: value_plugin_name,
                     service_network: value_service_network.ok_or_else(|| serde::de::Error::missing_field("serviceNetwork"))?,
@@ -527,9 +531,8 @@ impl serde::Serialize for ClusterNetwork {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            4 +
+            5 +
             self.hostsubnetlength.as_ref().map_or(0, |_| 1) +
-            self.metadata.as_ref().map_or(0, |_| 1) +
             self.network.as_ref().map_or(0, |_| 1) +
             self.plugin_name.as_ref().map_or(0, |_| 1) +
             self.vxlan_port.as_ref().map_or(0, |_| 1),
@@ -540,9 +543,7 @@ impl serde::Serialize for ClusterNetwork {
         if let Some(value) = &self.hostsubnetlength {
             serde::ser::SerializeStruct::serialize_field(&mut state, "hostsubnetlength", value)?;
         }
-        if let Some(value) = &self.metadata {
-            serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", value)?;
-        }
+        serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", &self.metadata)?;
         if let Some(value) = &self.network {
             serde::ser::SerializeStruct::serialize_field(&mut state, "network", value)?;
         }

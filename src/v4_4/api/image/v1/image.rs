@@ -28,7 +28,7 @@ pub struct Image {
     pub docker_image_signatures: Option<Vec<k8s_openapi::ByteString>>,
 
     /// Standard object's metadata.
-    pub metadata: Option<k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta>,
+    pub metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta,
 
     /// Signatures holds all signatures of the image.
     pub signatures: Option<Vec<crate::api::image::v1::ImageSignature>>,
@@ -407,8 +407,12 @@ impl k8s_openapi::ListableResource for Image {
 impl k8s_openapi::Metadata for Image {
     type Ty = k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
-    fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
-        self.metadata.as_ref()
+    fn metadata(&self) -> &<Self as k8s_openapi::Metadata>::Ty {
+        &self.metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+        &mut self.metadata
     }
 }
 
@@ -508,7 +512,7 @@ impl<'de> serde::Deserialize<'de> for Image {
                         Field::Key_docker_image_metadata_version => value_docker_image_metadata_version = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_docker_image_reference => value_docker_image_reference = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_docker_image_signatures => value_docker_image_signatures = serde::de::MapAccess::next_value(&mut map)?,
-                        Field::Key_metadata => value_metadata = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_metadata => value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_signatures => value_signatures = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Other => { let _: serde::de::IgnoredAny = serde::de::MapAccess::next_value(&mut map)?; },
                     }
@@ -523,7 +527,7 @@ impl<'de> serde::Deserialize<'de> for Image {
                     docker_image_metadata_version: value_docker_image_metadata_version,
                     docker_image_reference: value_docker_image_reference,
                     docker_image_signatures: value_docker_image_signatures,
-                    metadata: value_metadata,
+                    metadata: value_metadata.ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
                     signatures: value_signatures,
                 })
             }
@@ -554,7 +558,7 @@ impl serde::Serialize for Image {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            3 +
+            4 +
             self.docker_image_config.as_ref().map_or(0, |_| 1) +
             self.docker_image_manifest.as_ref().map_or(0, |_| 1) +
             self.docker_image_manifest_media_type.as_ref().map_or(0, |_| 1) +
@@ -562,7 +566,6 @@ impl serde::Serialize for Image {
             self.docker_image_metadata_version.as_ref().map_or(0, |_| 1) +
             self.docker_image_reference.as_ref().map_or(0, |_| 1) +
             self.docker_image_signatures.as_ref().map_or(0, |_| 1) +
-            self.metadata.as_ref().map_or(0, |_| 1) +
             self.signatures.as_ref().map_or(0, |_| 1),
         )?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "apiVersion", <Self as k8s_openapi::Resource>::API_VERSION)?;
@@ -589,9 +592,7 @@ impl serde::Serialize for Image {
         if let Some(value) = &self.docker_image_signatures {
             serde::ser::SerializeStruct::serialize_field(&mut state, "dockerImageSignatures", value)?;
         }
-        if let Some(value) = &self.metadata {
-            serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", value)?;
-        }
+        serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", &self.metadata)?;
         if let Some(value) = &self.signatures {
             serde::ser::SerializeStruct::serialize_field(&mut state, "signatures", value)?;
         }

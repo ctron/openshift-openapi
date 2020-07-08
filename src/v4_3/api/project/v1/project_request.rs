@@ -10,7 +10,7 @@ pub struct ProjectRequest {
     pub display_name: Option<String>,
 
     /// Standard object's metadata.
-    pub metadata: Option<k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta>,
+    pub metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta,
 }
 
 // Begin project.openshift.io/v1/ProjectRequest
@@ -163,8 +163,12 @@ impl k8s_openapi::Resource for ProjectRequest {
 impl k8s_openapi::Metadata for ProjectRequest {
     type Ty = k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
-    fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
-        self.metadata.as_ref()
+    fn metadata(&self) -> &<Self as k8s_openapi::Metadata>::Ty {
+        &self.metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+        &mut self.metadata
     }
 }
 
@@ -237,7 +241,7 @@ impl<'de> serde::Deserialize<'de> for ProjectRequest {
                         },
                         Field::Key_description => value_description = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_display_name => value_display_name = serde::de::MapAccess::next_value(&mut map)?,
-                        Field::Key_metadata => value_metadata = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_metadata => value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Other => { let _: serde::de::IgnoredAny = serde::de::MapAccess::next_value(&mut map)?; },
                     }
                 }
@@ -245,7 +249,7 @@ impl<'de> serde::Deserialize<'de> for ProjectRequest {
                 Ok(ProjectRequest {
                     description: value_description,
                     display_name: value_display_name,
-                    metadata: value_metadata,
+                    metadata: value_metadata.ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
                 })
             }
         }
@@ -268,10 +272,9 @@ impl serde::Serialize for ProjectRequest {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            2 +
+            3 +
             self.description.as_ref().map_or(0, |_| 1) +
-            self.display_name.as_ref().map_or(0, |_| 1) +
-            self.metadata.as_ref().map_or(0, |_| 1),
+            self.display_name.as_ref().map_or(0, |_| 1),
         )?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "apiVersion", <Self as k8s_openapi::Resource>::API_VERSION)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "kind", <Self as k8s_openapi::Resource>::KIND)?;
@@ -281,9 +284,7 @@ impl serde::Serialize for ProjectRequest {
         if let Some(value) = &self.display_name {
             serde::ser::SerializeStruct::serialize_field(&mut state, "displayName", value)?;
         }
-        if let Some(value) = &self.metadata {
-            serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", value)?;
-        }
+        serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", &self.metadata)?;
         serde::ser::SerializeStruct::end(state)
     }
 }

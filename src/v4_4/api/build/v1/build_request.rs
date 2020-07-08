@@ -19,7 +19,7 @@ pub struct BuildRequest {
     pub last_version: Option<i64>,
 
     /// metadata for BuildRequest.
-    pub metadata: Option<k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta>,
+    pub metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta,
 
     /// revision is the information from the source for a specific repo snapshot.
     pub revision: Option<crate::api::build::v1::SourceRevision>,
@@ -198,8 +198,12 @@ impl k8s_openapi::Resource for BuildRequest {
 impl k8s_openapi::Metadata for BuildRequest {
     type Ty = k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
-    fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
-        self.metadata.as_ref()
+    fn metadata(&self) -> &<Self as k8s_openapi::Metadata>::Ty {
+        &self.metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+        &mut self.metadata
     }
 }
 
@@ -296,7 +300,7 @@ impl<'de> serde::Deserialize<'de> for BuildRequest {
                         Field::Key_env => value_env = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_from => value_from = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_last_version => value_last_version = serde::de::MapAccess::next_value(&mut map)?,
-                        Field::Key_metadata => value_metadata = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_metadata => value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_revision => value_revision = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_source_strategy_options => value_source_strategy_options = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_triggered_by => value_triggered_by = Some(serde::de::MapAccess::next_value(&mut map)?),
@@ -311,7 +315,7 @@ impl<'de> serde::Deserialize<'de> for BuildRequest {
                     env: value_env,
                     from: value_from,
                     last_version: value_last_version,
-                    metadata: value_metadata,
+                    metadata: value_metadata.ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
                     revision: value_revision,
                     source_strategy_options: value_source_strategy_options,
                     triggered_by: value_triggered_by.ok_or_else(|| serde::de::Error::missing_field("triggeredBy"))?,
@@ -345,13 +349,12 @@ impl serde::Serialize for BuildRequest {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            3 +
+            4 +
             self.binary.as_ref().map_or(0, |_| 1) +
             self.docker_strategy_options.as_ref().map_or(0, |_| 1) +
             self.env.as_ref().map_or(0, |_| 1) +
             self.from.as_ref().map_or(0, |_| 1) +
             self.last_version.as_ref().map_or(0, |_| 1) +
-            self.metadata.as_ref().map_or(0, |_| 1) +
             self.revision.as_ref().map_or(0, |_| 1) +
             self.source_strategy_options.as_ref().map_or(0, |_| 1) +
             self.triggered_by_image.as_ref().map_or(0, |_| 1),
@@ -373,9 +376,7 @@ impl serde::Serialize for BuildRequest {
         if let Some(value) = &self.last_version {
             serde::ser::SerializeStruct::serialize_field(&mut state, "lastVersion", value)?;
         }
-        if let Some(value) = &self.metadata {
-            serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", value)?;
-        }
+        serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", &self.metadata)?;
         if let Some(value) = &self.revision {
             serde::ser::SerializeStruct::serialize_field(&mut state, "revision", value)?;
         }

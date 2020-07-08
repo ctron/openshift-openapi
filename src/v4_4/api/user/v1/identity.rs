@@ -7,7 +7,7 @@ pub struct Identity {
     pub extra: Option<std::collections::BTreeMap<String, String>>,
 
     /// Standard object's metadata.
-    pub metadata: Option<k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta>,
+    pub metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta,
 
     /// ProviderName is the source of identity information
     pub provider_name: String,
@@ -392,8 +392,12 @@ impl k8s_openapi::ListableResource for Identity {
 impl k8s_openapi::Metadata for Identity {
     type Ty = k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
-    fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
-        self.metadata.as_ref()
+    fn metadata(&self) -> &<Self as k8s_openapi::Metadata>::Ty {
+        &self.metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+        &mut self.metadata
     }
 }
 
@@ -471,7 +475,7 @@ impl<'de> serde::Deserialize<'de> for Identity {
                             }
                         },
                         Field::Key_extra => value_extra = serde::de::MapAccess::next_value(&mut map)?,
-                        Field::Key_metadata => value_metadata = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_metadata => value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_provider_name => value_provider_name = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_provider_user_name => value_provider_user_name = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_user => value_user = Some(serde::de::MapAccess::next_value(&mut map)?),
@@ -481,7 +485,7 @@ impl<'de> serde::Deserialize<'de> for Identity {
 
                 Ok(Identity {
                     extra: value_extra,
-                    metadata: value_metadata,
+                    metadata: value_metadata.ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
                     provider_name: value_provider_name.ok_or_else(|| serde::de::Error::missing_field("providerName"))?,
                     provider_user_name: value_provider_user_name.ok_or_else(|| serde::de::Error::missing_field("providerUserName"))?,
                     user: value_user.ok_or_else(|| serde::de::Error::missing_field("user"))?,
@@ -509,18 +513,15 @@ impl serde::Serialize for Identity {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            5 +
-            self.extra.as_ref().map_or(0, |_| 1) +
-            self.metadata.as_ref().map_or(0, |_| 1),
+            6 +
+            self.extra.as_ref().map_or(0, |_| 1),
         )?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "apiVersion", <Self as k8s_openapi::Resource>::API_VERSION)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "kind", <Self as k8s_openapi::Resource>::KIND)?;
         if let Some(value) = &self.extra {
             serde::ser::SerializeStruct::serialize_field(&mut state, "extra", value)?;
         }
-        if let Some(value) = &self.metadata {
-            serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", value)?;
-        }
+        serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", &self.metadata)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "providerName", &self.provider_name)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "providerUserName", &self.provider_user_name)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "user", &self.user)?;

@@ -7,7 +7,7 @@ pub struct OAuthClientAuthorization {
     pub client_name: Option<String>,
 
     /// Standard object's metadata.
-    pub metadata: Option<k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta>,
+    pub metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta,
 
     /// Scopes is an array of the granted scopes.
     pub scopes: Option<Vec<String>>,
@@ -392,8 +392,12 @@ impl k8s_openapi::ListableResource for OAuthClientAuthorization {
 impl k8s_openapi::Metadata for OAuthClientAuthorization {
     type Ty = k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
-    fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
-        self.metadata.as_ref()
+    fn metadata(&self) -> &<Self as k8s_openapi::Metadata>::Ty {
+        &self.metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+        &mut self.metadata
     }
 }
 
@@ -471,7 +475,7 @@ impl<'de> serde::Deserialize<'de> for OAuthClientAuthorization {
                             }
                         },
                         Field::Key_client_name => value_client_name = serde::de::MapAccess::next_value(&mut map)?,
-                        Field::Key_metadata => value_metadata = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_metadata => value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_scopes => value_scopes = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_user_name => value_user_name = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_user_uid => value_user_uid = serde::de::MapAccess::next_value(&mut map)?,
@@ -481,7 +485,7 @@ impl<'de> serde::Deserialize<'de> for OAuthClientAuthorization {
 
                 Ok(OAuthClientAuthorization {
                     client_name: value_client_name,
-                    metadata: value_metadata,
+                    metadata: value_metadata.ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
                     scopes: value_scopes,
                     user_name: value_user_name,
                     user_uid: value_user_uid,
@@ -509,9 +513,8 @@ impl serde::Serialize for OAuthClientAuthorization {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            2 +
+            3 +
             self.client_name.as_ref().map_or(0, |_| 1) +
-            self.metadata.as_ref().map_or(0, |_| 1) +
             self.scopes.as_ref().map_or(0, |_| 1) +
             self.user_name.as_ref().map_or(0, |_| 1) +
             self.user_uid.as_ref().map_or(0, |_| 1),
@@ -521,9 +524,7 @@ impl serde::Serialize for OAuthClientAuthorization {
         if let Some(value) = &self.client_name {
             serde::ser::SerializeStruct::serialize_field(&mut state, "clientName", value)?;
         }
-        if let Some(value) = &self.metadata {
-            serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", value)?;
-        }
+        serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", &self.metadata)?;
         if let Some(value) = &self.scopes {
             serde::ser::SerializeStruct::serialize_field(&mut state, "scopes", value)?;
         }
