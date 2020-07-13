@@ -39,7 +39,7 @@ pub(crate) fn create_delete_optional(
             kind: crate::swagger20::SchemaKind::Ty(crate::swagger20::Type::DeleteOptional(
                 delete_optional_properties,
             )),
-            kubernetes_group_kind_versions: None,
+            kubernetes_group_kind_versions: vec![],
             has_corresponding_list_type: false,
         },
     );
@@ -94,10 +94,9 @@ pub(crate) fn create_optionals(spec: &mut crate::swagger20::Spec) -> Result<(), 
                 ),
                 kind: crate::swagger20::SchemaKind::Ref(crate::swagger20::RefPath {
                     path: type_name.to_owned(),
-                    relative_to: crate::swagger20::RefPathRelativeTo::Crate,
                     can_be_default: None,
                 }),
-                kubernetes_group_kind_versions: None,
+                kubernetes_group_kind_versions: vec![],
                 has_corresponding_list_type: false,
             },
         });
@@ -183,7 +182,7 @@ pub(crate) fn create_optionals(spec: &mut crate::swagger20::Spec) -> Result<(), 
                     description
                 )),
                 kind: crate::swagger20::SchemaKind::Ty(ty(optional_definition)),
-                kubernetes_group_kind_versions: None,
+                kubernetes_group_kind_versions: vec![],
                 has_corresponding_list_type: false,
             },
         );
@@ -234,10 +233,9 @@ pub(crate) fn remove_delete_collection_operations_query_parameters(
                         ),
                         kind: crate::swagger20::SchemaKind::Ref(crate::swagger20::RefPath {
                             path: "io.k8s.DeleteOptional".to_owned(),
-                            relative_to: crate::swagger20::RefPathRelativeTo::Crate,
                             can_be_default: None,
                         }),
-                        kubernetes_group_kind_versions: None,
+                        kubernetes_group_kind_versions: vec![],
                         has_corresponding_list_type: false,
                     },
                 }));
@@ -253,10 +251,9 @@ pub(crate) fn remove_delete_collection_operations_query_parameters(
                         ),
                         kind: crate::swagger20::SchemaKind::Ref(crate::swagger20::RefPath {
                             path: "io.k8s.ListOptional".to_owned(),
-                            relative_to: crate::swagger20::RefPathRelativeTo::Crate,
                             can_be_default: None,
                         }),
-                        kubernetes_group_kind_versions: None,
+                        kubernetes_group_kind_versions: vec![],
                         has_corresponding_list_type: false,
                     },
                 }));
@@ -305,10 +302,9 @@ pub(crate) fn remove_delete_operations_query_parameters(
 								description: Some("Optional parameters. Use `Default::default()` to not pass any.".to_owned()),
 								kind: crate::swagger20::SchemaKind::Ref(crate::swagger20::RefPath {
 									path: "io.k8s.DeleteOptional".to_owned(),
-									relative_to: crate::swagger20::RefPathRelativeTo::Crate,
 									can_be_default: None,
 								}),
-								kubernetes_group_kind_versions: None,
+								kubernetes_group_kind_versions: vec![],
 								has_corresponding_list_type: false,
 							},
 						}));
@@ -443,7 +439,7 @@ pub(crate) fn separate_watch_from_list_operations(
             kind: crate::swagger20::SchemaKind::Ty(crate::swagger20::Type::ListOptional(
                 list_optional_definition,
             )),
-            kubernetes_group_kind_versions: None,
+            kubernetes_group_kind_versions: vec![],
             has_corresponding_list_type: false,
         },
     );
@@ -455,7 +451,7 @@ pub(crate) fn separate_watch_from_list_operations(
             kind: crate::swagger20::SchemaKind::Ty(crate::swagger20::Type::WatchOptional(
                 watch_optional_definition,
             )),
-            kubernetes_group_kind_versions: None,
+            kubernetes_group_kind_versions: vec![],
             has_corresponding_list_type: false,
         },
     );
@@ -470,10 +466,9 @@ pub(crate) fn separate_watch_from_list_operations(
             ),
             kind: crate::swagger20::SchemaKind::Ref(crate::swagger20::RefPath {
                 path: "io.k8s.ListOptional".to_owned(),
-                relative_to: crate::swagger20::RefPathRelativeTo::Crate,
                 can_be_default: None,
             }),
-            kubernetes_group_kind_versions: None,
+            kubernetes_group_kind_versions: vec![],
             has_corresponding_list_type: false,
         },
     });
@@ -488,10 +483,9 @@ pub(crate) fn separate_watch_from_list_operations(
             ),
             kind: crate::swagger20::SchemaKind::Ref(crate::swagger20::RefPath {
                 path: "io.k8s.WatchOptional".to_owned(),
-                relative_to: crate::swagger20::RefPathRelativeTo::Crate,
                 can_be_default: None,
             }),
-            kubernetes_group_kind_versions: None,
+            kubernetes_group_kind_versions: vec![],
             has_corresponding_list_type: false,
         },
     });
@@ -581,10 +575,9 @@ pub(crate) fn separate_watch_from_list_operations(
                     description: Some("OK".to_owned()),
                     kind: crate::swagger20::SchemaKind::Ref(crate::swagger20::RefPath {
                         path: "io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent".to_owned(),
-                        relative_to: crate::swagger20::RefPathRelativeTo::Crate,
                         can_be_default: None,
                     }),
-                    kubernetes_group_kind_versions: None,
+                    kubernetes_group_kind_versions: vec![],
                     has_corresponding_list_type: false,
                 },
             );
@@ -616,7 +609,6 @@ pub(crate) fn separate_watch_from_list_operations(
 // Annotate the `WatchEvent` type as `swagger20::Type::WatchEvent` for special codegen.
 pub(crate) fn watch_event(spec: &mut crate::swagger20::Spec) -> Result<(), crate::Error> {
     use std::fmt::Write;
-
     let definition_path = crate::swagger20::DefinitionPath(
         "io.k8s.apimachinery.pkg.apis.meta.v1.WatchEvent".to_owned(),
     );
@@ -643,7 +635,6 @@ pub(crate) fn watch_event(spec: &mut crate::swagger20::Spec) -> Result<(), crate
             }
         }
     }
-
     Err("never applied WatchEvent override".into())
 }
 
@@ -719,27 +710,18 @@ pub(crate) fn list(spec: &mut crate::swagger20::Spec) -> Result<(), crate::Error
 					spec.definitions.get(&crate::swagger20::DefinitionPath(item_ref_path.path.clone()))
 					.ok_or_else(|| format!("definition {} looks like a list but its item's definition does not exist in the spec", definition_path))?;
 
-            let item_kubernetes_group_kind_version = {
-                let item_kubernetes_group_kind_versions =
-						item_schema.kubernetes_group_kind_versions.as_ref()
-						.ok_or_else(|| format!("definition {} looks like a list but its item's definition does not have a group-version-kind", definition_path))?;
-                if item_kubernetes_group_kind_versions.len() != 1 {
-                    eprintln!("{:?}", item_kubernetes_group_kind_versions);
-                    return Err(format!("definition {} looks like a list but its item's definition does not have a single group-version-kind", definition_path).into());
-                }
-                &item_kubernetes_group_kind_versions[0]
+            let item_kubernetes_group_kind_version = match &item_schema.kubernetes_group_kind_versions[..] {
+                [group_kind_version] => group_kind_version,
+                _ => return Err(format!(
+                    "definition {} looks like a list but its item's definition does not have a single group-version-kind",
+                    definition_path).into()),
             };
 
-            let list_kubernetes_group_kind_version = {
-                let list_kubernetes_group_kind_versions =
-						definition.kubernetes_group_kind_versions.as_ref()
-						.ok_or_else(|| format!("definition {} looks like a list but it does not have a group-version-kind", definition_path))?;
-                if list_kubernetes_group_kind_versions.len() != 1 {
-                    eprintln!("{:?}", list_kubernetes_group_kind_versions);
-                    return Err(format!("definition {} looks like a list but it does not have a single group-version-kind", definition_path).into());
-                }
-
-                &list_kubernetes_group_kind_versions[0]
+            let list_kubernetes_group_kind_version = match &definition.kubernetes_group_kind_versions[..] {
+                [group_kind_version] => group_kind_version,
+                _ => return Err(format!(
+                    "definition {} looks like a list but it does not have a single group-version-kind",
+                    definition_path).into()),
             };
 
             let item_gkv_corresponds_to_list_gkv = list_kubernetes_group_kind_version.group
@@ -783,15 +765,14 @@ pub(crate) fn list(spec: &mut crate::swagger20::Spec) -> Result<(), crate::Error
                                 kind: crate::swagger20::SchemaKind::Ref(
                                     crate::swagger20::RefPath {
                                         path: "T".to_owned(),
-                                        relative_to: crate::swagger20::RefPathRelativeTo::Scope,
                                         can_be_default: None,
                                     },
                                 ),
-                                kubernetes_group_kind_versions: None,
+                                kubernetes_group_kind_versions: vec![],
                                 has_corresponding_list_type: false,
                             }),
                         }),
-                        kubernetes_group_kind_versions: None,
+                        kubernetes_group_kind_versions: vec![],
                         has_corresponding_list_type: false,
                     },
                     true,
@@ -816,7 +797,7 @@ pub(crate) fn list(spec: &mut crate::swagger20::Spec) -> Result<(), crate::Error
             kind: crate::swagger20::SchemaKind::Ty(crate::swagger20::Type::ListDef {
                 metadata: Box::new(metadata_schema_kind),
             }),
-            kubernetes_group_kind_versions: None,
+            kubernetes_group_kind_versions: vec![],
             has_corresponding_list_type: false,
         },
     );
@@ -1026,14 +1007,11 @@ pub(crate) fn response_types(spec: &mut crate::swagger20::Spec) -> Result<(), cr
                                                     operation.id, kubernetes_group_kind_version
                                                 )
                                             });
-                                        if let Some(kubernetes_group_kind_versions) =
-                                            &response_schema.kubernetes_group_kind_versions
+                                        if response_schema
+                                            .kubernetes_group_kind_versions
+                                            .contains(kubernetes_group_kind_version)
                                         {
-                                            if kubernetes_group_kind_versions
-                                                .contains(kubernetes_group_kind_version)
-                                            {
-                                                return true;
-                                            }
+                                            return true;
                                         }
                                     }
 
@@ -1343,7 +1321,7 @@ pub(crate) fn response_types(spec: &mut crate::swagger20::Spec) -> Result<(), cr
             crate::swagger20::Schema {
                 description: Some(description.to_owned()),
                 kind: crate::swagger20::SchemaKind::Ty(ty),
-                kubernetes_group_kind_versions: None,
+                kubernetes_group_kind_versions: vec![],
                 has_corresponding_list_type: false,
             },
         );
@@ -1354,7 +1332,9 @@ pub(crate) fn response_types(spec: &mut crate::swagger20::Spec) -> Result<(), cr
 
 // The `metadata` property of resource types is generally not optional, so override the property to be required.
 // For situations like PATCH requests where the property *is* optional, sending an empty object works the same.
-pub(crate) fn resource_metadata_not_optional(spec: &mut crate::swagger20::Spec) -> Result<(), crate::Error> {
+pub(crate) fn resource_metadata_not_optional(
+    spec: &mut crate::swagger20::Spec,
+) -> Result<(), crate::Error> {
     let mut found = false;
 
     for definition in spec.definitions.values_mut() {
@@ -1366,14 +1346,17 @@ pub(crate) fn resource_metadata_not_optional(spec: &mut crate::swagger20::Spec) 
             for (name, (_, required)) in &mut *properties {
                 has_api_version = has_api_version || name.0 == "apiVersion";
                 has_kind = has_kind || name.0 == "kind";
-                has_optional_metadata = has_optional_metadata || (name.0 == "metadata" && !*required);
+                has_optional_metadata =
+                    has_optional_metadata || (name.0 == "metadata" && !*required);
                 if has_api_version && has_kind && has_optional_metadata {
                     break;
                 }
             }
 
             if has_api_version && has_kind && has_optional_metadata {
-                let metadata = properties.get_mut(&crate::swagger20::PropertyName("metadata".to_owned())).unwrap();
+                let metadata = properties
+                    .get_mut(&crate::swagger20::PropertyName("metadata".to_owned()))
+                    .unwrap();
                 metadata.1 = true;
                 found = true;
             }
@@ -1382,8 +1365,7 @@ pub(crate) fn resource_metadata_not_optional(spec: &mut crate::swagger20::Spec) 
 
     if found {
         Ok(())
-    }
-    else {
+    } else {
         Err("never applied override to make resource metadata non-optional".into())
     }
 }
