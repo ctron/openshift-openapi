@@ -20,9 +20,10 @@ the Kubernetes APIs, that is handled by the `k8s_openapi` crate. It only contain
 
 | OpenShift Version | Feature | Kubernetes Version | `k8s_openapi` Feature |
 | ----------------- | ------- | ------------------ | --------------------- |
+| 4.2.x             | `v4_2`  | 1.15.x             | `v1_15`               |
 | 4.3.x             | `v4_3`  | 1.16.x             | `v1_16`               |
 | 4.4.x             | `v4_4`  | 1.17.x             | `v1_17`               |
+| 4.5.x             | `v4_5`  | 1.18.x             | `v1_18`               |
 
-**Note:** Enabling a version feature (like `v4_4`) in this crate, will automatically
-enable the corresponding feature (like `v1_17`) for the `k8s_openapi` crate.
-  
+**Note:** Enabling a version feature (for example`v4_4`) in this crate, will automatically
+enable the corresponding feature (`v1_17`) for the `k8s_openapi` crate.
