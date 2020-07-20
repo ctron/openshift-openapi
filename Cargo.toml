@@ -35,7 +35,7 @@ v4_3 = [ "k8s-openapi/v1_16" ]
 v4_4 = [ "k8s-openapi/v1_17" ]
 
 [patch.crates-io]
-k8s-openapi = { git = "https://github.com/ctron/k8s-openapi", branch="feature/openshift_api_2" }
+k8s-openapi = { git = "https://github.com/Arnavion/k8s-openapi", branch="master" }
 
 [package.metadata.docs.rs]
 features = ["v4_4"]

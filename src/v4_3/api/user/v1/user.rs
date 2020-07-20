@@ -13,7 +13,7 @@ pub struct User {
     pub identities: Vec<String>,
 
     /// Standard object's metadata.
-    pub metadata: Option<k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta>,
+    pub metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta,
 }
 
 // Begin user.openshift.io/v1/User
@@ -389,8 +389,12 @@ impl k8s_openapi::ListableResource for User {
 impl k8s_openapi::Metadata for User {
     type Ty = k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
-    fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
-        self.metadata.as_ref()
+    fn metadata(&self) -> &<Self as k8s_openapi::Metadata>::Ty {
+        &self.metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+        &mut self.metadata
     }
 }
 
@@ -467,7 +471,7 @@ impl<'de> serde::Deserialize<'de> for User {
                         Field::Key_full_name => value_full_name = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_groups => value_groups = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_identities => value_identities = Some(serde::de::MapAccess::next_value(&mut map)?),
-                        Field::Key_metadata => value_metadata = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_metadata => value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Other => { let _: serde::de::IgnoredAny = serde::de::MapAccess::next_value(&mut map)?; },
                     }
                 }
@@ -476,7 +480,7 @@ impl<'de> serde::Deserialize<'de> for User {
                     full_name: value_full_name,
                     groups: value_groups.ok_or_else(|| serde::de::Error::missing_field("groups"))?,
                     identities: value_identities.ok_or_else(|| serde::de::Error::missing_field("identities"))?,
-                    metadata: value_metadata,
+                    metadata: value_metadata.ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
                 })
             }
         }
@@ -500,9 +504,8 @@ impl serde::Serialize for User {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            4 +
-            self.full_name.as_ref().map_or(0, |_| 1) +
-            self.metadata.as_ref().map_or(0, |_| 1),
+            5 +
+            self.full_name.as_ref().map_or(0, |_| 1),
         )?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "apiVersion", <Self as k8s_openapi::Resource>::API_VERSION)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "kind", <Self as k8s_openapi::Resource>::KIND)?;
@@ -511,9 +514,7 @@ impl serde::Serialize for User {
         }
         serde::ser::SerializeStruct::serialize_field(&mut state, "groups", &self.groups)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "identities", &self.identities)?;
-        if let Some(value) = &self.metadata {
-            serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", value)?;
-        }
+        serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", &self.metadata)?;
         serde::ser::SerializeStruct::end(state)
     }
 }

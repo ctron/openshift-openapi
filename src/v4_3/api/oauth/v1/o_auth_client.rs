@@ -19,7 +19,7 @@ pub struct OAuthClient {
     pub grant_method: Option<String>,
 
     /// Standard object's metadata.
-    pub metadata: Option<k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta>,
+    pub metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta,
 
     /// RedirectURIs is the valid redirection URIs associated with a client
     pub redirect_ur_is: Option<Vec<String>>,
@@ -407,8 +407,12 @@ impl k8s_openapi::ListableResource for OAuthClient {
 impl k8s_openapi::Metadata for OAuthClient {
     type Ty = k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
-    fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
-        self.metadata.as_ref()
+    fn metadata(&self) -> &<Self as k8s_openapi::Metadata>::Ty {
+        &self.metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+        &mut self.metadata
     }
 }
 
@@ -501,7 +505,7 @@ impl<'de> serde::Deserialize<'de> for OAuthClient {
                         Field::Key_access_token_max_age_seconds => value_access_token_max_age_seconds = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_additional_secrets => value_additional_secrets = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_grant_method => value_grant_method = serde::de::MapAccess::next_value(&mut map)?,
-                        Field::Key_metadata => value_metadata = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_metadata => value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_redirect_ur_is => value_redirect_ur_is = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_respond_with_challenges => value_respond_with_challenges = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_scope_restrictions => value_scope_restrictions = serde::de::MapAccess::next_value(&mut map)?,
@@ -515,7 +519,7 @@ impl<'de> serde::Deserialize<'de> for OAuthClient {
                     access_token_max_age_seconds: value_access_token_max_age_seconds,
                     additional_secrets: value_additional_secrets,
                     grant_method: value_grant_method,
-                    metadata: value_metadata,
+                    metadata: value_metadata.ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
                     redirect_ur_is: value_redirect_ur_is,
                     respond_with_challenges: value_respond_with_challenges,
                     scope_restrictions: value_scope_restrictions,
@@ -548,12 +552,11 @@ impl serde::Serialize for OAuthClient {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            2 +
+            3 +
             self.access_token_inactivity_timeout_seconds.as_ref().map_or(0, |_| 1) +
             self.access_token_max_age_seconds.as_ref().map_or(0, |_| 1) +
             self.additional_secrets.as_ref().map_or(0, |_| 1) +
             self.grant_method.as_ref().map_or(0, |_| 1) +
-            self.metadata.as_ref().map_or(0, |_| 1) +
             self.redirect_ur_is.as_ref().map_or(0, |_| 1) +
             self.respond_with_challenges.as_ref().map_or(0, |_| 1) +
             self.scope_restrictions.as_ref().map_or(0, |_| 1) +
@@ -573,9 +576,7 @@ impl serde::Serialize for OAuthClient {
         if let Some(value) = &self.grant_method {
             serde::ser::SerializeStruct::serialize_field(&mut state, "grantMethod", value)?;
         }
-        if let Some(value) = &self.metadata {
-            serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", value)?;
-        }
+        serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", &self.metadata)?;
         if let Some(value) = &self.redirect_ur_is {
             serde::ser::SerializeStruct::serialize_field(&mut state, "redirectURIs", value)?;
         }

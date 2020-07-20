@@ -7,7 +7,7 @@ pub struct NetNamespace {
     pub egress_i_ps: Option<Vec<String>>,
 
     /// Standard object's metadata.
-    pub metadata: Option<k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta>,
+    pub metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta,
 
     /// NetID is the network identifier of the network namespace assigned to each overlay network packet. This can be manipulated with the "oc adm pod-network" commands.
     pub netid: i64,
@@ -389,8 +389,12 @@ impl k8s_openapi::ListableResource for NetNamespace {
 impl k8s_openapi::Metadata for NetNamespace {
     type Ty = k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
-    fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
-        self.metadata.as_ref()
+    fn metadata(&self) -> &<Self as k8s_openapi::Metadata>::Ty {
+        &self.metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+        &mut self.metadata
     }
 }
 
@@ -465,7 +469,7 @@ impl<'de> serde::Deserialize<'de> for NetNamespace {
                             }
                         },
                         Field::Key_egress_i_ps => value_egress_i_ps = serde::de::MapAccess::next_value(&mut map)?,
-                        Field::Key_metadata => value_metadata = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_metadata => value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_netid => value_netid = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_netname => value_netname = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Other => { let _: serde::de::IgnoredAny = serde::de::MapAccess::next_value(&mut map)?; },
@@ -474,7 +478,7 @@ impl<'de> serde::Deserialize<'de> for NetNamespace {
 
                 Ok(NetNamespace {
                     egress_i_ps: value_egress_i_ps,
-                    metadata: value_metadata,
+                    metadata: value_metadata.ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
                     netid: value_netid.ok_or_else(|| serde::de::Error::missing_field("netid"))?,
                     netname: value_netname.ok_or_else(|| serde::de::Error::missing_field("netname"))?,
                 })
@@ -500,18 +504,15 @@ impl serde::Serialize for NetNamespace {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            4 +
-            self.egress_i_ps.as_ref().map_or(0, |_| 1) +
-            self.metadata.as_ref().map_or(0, |_| 1),
+            5 +
+            self.egress_i_ps.as_ref().map_or(0, |_| 1),
         )?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "apiVersion", <Self as k8s_openapi::Resource>::API_VERSION)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "kind", <Self as k8s_openapi::Resource>::KIND)?;
         if let Some(value) = &self.egress_i_ps {
             serde::ser::SerializeStruct::serialize_field(&mut state, "egressIPs", value)?;
         }
-        if let Some(value) = &self.metadata {
-            serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", value)?;
-        }
+        serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", &self.metadata)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "netid", &self.netid)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "netname", &self.netname)?;
         serde::ser::SerializeStruct::end(state)

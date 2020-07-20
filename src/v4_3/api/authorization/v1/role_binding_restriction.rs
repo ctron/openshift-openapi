@@ -499,8 +499,12 @@ impl k8s_openapi::ListableResource for RoleBindingRestriction {
 impl k8s_openapi::Metadata for RoleBindingRestriction {
     type Ty = k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
-    fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
-        Some(&self.metadata)
+    fn metadata(&self) -> &<Self as k8s_openapi::Metadata>::Ty {
+        &self.metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+        &mut self.metadata
     }
 }
 

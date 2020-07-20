@@ -17,7 +17,7 @@ mod fixups;
 mod logger;
 mod supported_version;
 
-use k8s_openapi_codegen_common::{swagger20, CrateRooter};
+use k8s_openapi_codegen_common::{swagger20, MapNamespace};
 
 struct Error(
     Box<dyn std::error::Error + Send + Sync>,
@@ -123,21 +123,23 @@ fn main() -> Result<(), Error> {
     result
 }
 
-struct OpenshiftCrateRooter {}
+struct OpenShiftMapper;
 
-impl CrateRooter for OpenshiftCrateRooter {
-    fn root(&self, namespace: &Vec<&str>) -> String {
-        let result = match &namespace[..] {
-            ["com", "github", "openshift"] => "crate".into(),
-            ["com", "github", "openshift", ..] => "crate".into(),
-            ["io", "k8s"] => "k8s_openapi".into(),
-            ["io", "k8s", ..] => "k8s_openapi".into(),
-            _ => namespace.join("::").into(),
-        };
-
-        log::trace!("Rooted {:?} => {}", &namespace, &result);
-
-        result
+impl MapNamespace for OpenShiftMapper {
+    fn map_namespace<'a>(&self, path_parts: &[&'a str]) -> Option<Vec<&'a str>> {
+        match path_parts {
+            ["io", "k8s", rest @ ..] => Some(
+                std::iter::once("k8s_openapi")
+                    .chain(rest.iter().copied())
+                    .collect(),
+            ),
+            ["com", "github", "openshift", rest @ ..] => Some(
+                std::iter::once("crate")
+                    .chain(rest.iter().copied())
+                    .collect(),
+            ),
+            _ => None,
+        }
     }
 }
 
@@ -151,18 +153,6 @@ fn run(
     let mod_root = supported_version.mod_root();
 
     let out_dir = out_dir_base.join(mod_root);
-
-    let replace_namespaces: &[(
-        &[std::borrow::Cow<'static, str>],
-        &[std::borrow::Cow<'static, str>],
-    )] = &[
-        // strip "com.github.openshift"
-        (&["com".into(), "github".into(), "openshift".into()], &[]),
-        // and use"k8s_openapi" for "io.k8s"
-        (&["io".into(), "k8s".into()], &[]),
-    ];
-
-    let crate_root = OpenshiftCrateRooter {};
 
     let mut num_generated_structs = 0usize;
     let mut num_generated_type_aliases = 0usize;
@@ -245,15 +235,13 @@ fn run(
             &spec.definitions,
             &mut spec.operations,
             definition_path,
-            swagger20::RefPathRelativeTo::Crate,
-            replace_namespaces,
-            &crate_root,
+            &OpenShiftMapper,
             "pub ",
-            true,
-            |parts, is_under_api_feature| {
+            Some("api"),
+            |parts, type_feature| {
                 let mut current = out_dir.to_owned();
 
-                for part in parts.iter().rev().skip(1).rev() {
+                for part in parts.iter().skip(1).rev().skip(1).rev() {
                     log::trace!("Current directory: {}", current.display());
 
                     let mod_name = k8s_openapi_codegen_common::get_rust_ident(part);
@@ -299,12 +287,12 @@ fn run(
                         .open(current.join("mod.rs"))?,
                 );
                 writeln!(parent_mod_rs)?;
-                if is_under_api_feature {
-                    writeln!(parent_mod_rs, r#"#[cfg(feature = "api")]"#)?;
+                if let Some(type_feature) = type_feature {
+                    writeln!(parent_mod_rs, r#"#[cfg(feature = "{}")]"#, type_feature)?;
                 }
                 writeln!(parent_mod_rs, "mod {};", mod_name)?;
-                if is_under_api_feature {
-                    writeln!(parent_mod_rs, r#"#[cfg(feature = "api")]"#)?;
+                if let Some(type_feature) = type_feature {
+                    writeln!(parent_mod_rs, r#"#[cfg(feature = "{}")]"#, type_feature)?;
                 }
                 writeln!(parent_mod_rs, "pub use self::{}::{};", mod_name, type_name)?;
 
@@ -376,11 +364,10 @@ fn run(
             k8s_openapi_codegen_common::write_operation(
                 &mut mod_root_file,
                 &operation,
-                replace_namespaces,
-                &crate_root,
+                &OpenShiftMapper,
                 "pub ",
-                &mut None,
-                true,
+                None,
+                Some("api"),
             )?;
 
             num_generated_apis += 1;

@@ -10,7 +10,7 @@ pub struct Template {
     pub message: Option<String>,
 
     /// Standard object's metadata.
-    pub metadata: Option<k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta>,
+    pub metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta,
 
     /// objects is an array of resources to include in this template. If a namespace value is hardcoded in the object, it will be removed during template instantiation, however if the namespace value is, or contains, a ${PARAMETER_REFERENCE}, the resolved value after parameter substitution will be respected and the object will be created in that namespace.
     pub objects: Vec<k8s_openapi::apimachinery::pkg::runtime::RawExtension>,
@@ -508,8 +508,12 @@ impl k8s_openapi::ListableResource for Template {
 impl k8s_openapi::Metadata for Template {
     type Ty = k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
-    fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
-        self.metadata.as_ref()
+    fn metadata(&self) -> &<Self as k8s_openapi::Metadata>::Ty {
+        &self.metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+        &mut self.metadata
     }
 }
 
@@ -588,7 +592,7 @@ impl<'de> serde::Deserialize<'de> for Template {
                         },
                         Field::Key_labels => value_labels = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_message => value_message = serde::de::MapAccess::next_value(&mut map)?,
-                        Field::Key_metadata => value_metadata = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_metadata => value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_objects => value_objects = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_parameters => value_parameters = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Other => { let _: serde::de::IgnoredAny = serde::de::MapAccess::next_value(&mut map)?; },
@@ -598,7 +602,7 @@ impl<'de> serde::Deserialize<'de> for Template {
                 Ok(Template {
                     labels: value_labels,
                     message: value_message,
-                    metadata: value_metadata,
+                    metadata: value_metadata.ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
                     objects: value_objects.ok_or_else(|| serde::de::Error::missing_field("objects"))?,
                     parameters: value_parameters,
                 })
@@ -625,10 +629,9 @@ impl serde::Serialize for Template {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            3 +
+            4 +
             self.labels.as_ref().map_or(0, |_| 1) +
             self.message.as_ref().map_or(0, |_| 1) +
-            self.metadata.as_ref().map_or(0, |_| 1) +
             self.parameters.as_ref().map_or(0, |_| 1),
         )?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "apiVersion", <Self as k8s_openapi::Resource>::API_VERSION)?;
@@ -639,9 +642,7 @@ impl serde::Serialize for Template {
         if let Some(value) = &self.message {
             serde::ser::SerializeStruct::serialize_field(&mut state, "message", value)?;
         }
-        if let Some(value) = &self.metadata {
-            serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", value)?;
-        }
+        serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", &self.metadata)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "objects", &self.objects)?;
         if let Some(value) = &self.parameters {
             serde::ser::SerializeStruct::serialize_field(&mut state, "parameters", value)?;

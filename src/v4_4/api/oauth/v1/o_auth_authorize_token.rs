@@ -16,7 +16,7 @@ pub struct OAuthAuthorizeToken {
     pub expires_in: Option<i64>,
 
     /// Standard object's metadata.
-    pub metadata: Option<k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta>,
+    pub metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta,
 
     /// RedirectURI is the redirection associated with the token.
     pub redirect_uri: Option<String>,
@@ -407,8 +407,12 @@ impl k8s_openapi::ListableResource for OAuthAuthorizeToken {
 impl k8s_openapi::Metadata for OAuthAuthorizeToken {
     type Ty = k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
-    fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
-        self.metadata.as_ref()
+    fn metadata(&self) -> &<Self as k8s_openapi::Metadata>::Ty {
+        &self.metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+        &mut self.metadata
     }
 }
 
@@ -504,7 +508,7 @@ impl<'de> serde::Deserialize<'de> for OAuthAuthorizeToken {
                         Field::Key_code_challenge => value_code_challenge = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_code_challenge_method => value_code_challenge_method = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_expires_in => value_expires_in = serde::de::MapAccess::next_value(&mut map)?,
-                        Field::Key_metadata => value_metadata = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_metadata => value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_redirect_uri => value_redirect_uri = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_scopes => value_scopes = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_state => value_state = serde::de::MapAccess::next_value(&mut map)?,
@@ -519,7 +523,7 @@ impl<'de> serde::Deserialize<'de> for OAuthAuthorizeToken {
                     code_challenge: value_code_challenge,
                     code_challenge_method: value_code_challenge_method,
                     expires_in: value_expires_in,
-                    metadata: value_metadata,
+                    metadata: value_metadata.ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
                     redirect_uri: value_redirect_uri,
                     scopes: value_scopes,
                     state: value_state,
@@ -554,12 +558,11 @@ impl serde::Serialize for OAuthAuthorizeToken {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            2 +
+            3 +
             self.client_name.as_ref().map_or(0, |_| 1) +
             self.code_challenge.as_ref().map_or(0, |_| 1) +
             self.code_challenge_method.as_ref().map_or(0, |_| 1) +
             self.expires_in.as_ref().map_or(0, |_| 1) +
-            self.metadata.as_ref().map_or(0, |_| 1) +
             self.redirect_uri.as_ref().map_or(0, |_| 1) +
             self.scopes.as_ref().map_or(0, |_| 1) +
             self.state.as_ref().map_or(0, |_| 1) +
@@ -580,9 +583,7 @@ impl serde::Serialize for OAuthAuthorizeToken {
         if let Some(value) = &self.expires_in {
             serde::ser::SerializeStruct::serialize_field(&mut state, "expiresIn", value)?;
         }
-        if let Some(value) = &self.metadata {
-            serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", value)?;
-        }
+        serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", &self.metadata)?;
         if let Some(value) = &self.redirect_uri {
             serde::ser::SerializeStruct::serialize_field(&mut state, "redirectURI", value)?;
         }

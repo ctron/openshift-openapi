@@ -7,7 +7,7 @@ pub struct RangeAllocation {
     pub data: k8s_openapi::ByteString,
 
     /// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
-    pub metadata: Option<k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta>,
+    pub metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta,
 
     /// range is a string representing a unique label for a range of uids, "1000000000-2000000000/10000".
     pub range: String,
@@ -386,8 +386,12 @@ impl k8s_openapi::ListableResource for RangeAllocation {
 impl k8s_openapi::Metadata for RangeAllocation {
     type Ty = k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
-    fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
-        self.metadata.as_ref()
+    fn metadata(&self) -> &<Self as k8s_openapi::Metadata>::Ty {
+        &self.metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+        &mut self.metadata
     }
 }
 
@@ -459,7 +463,7 @@ impl<'de> serde::Deserialize<'de> for RangeAllocation {
                             }
                         },
                         Field::Key_data => value_data = Some(serde::de::MapAccess::next_value(&mut map)?),
-                        Field::Key_metadata => value_metadata = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_metadata => value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_range => value_range = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Other => { let _: serde::de::IgnoredAny = serde::de::MapAccess::next_value(&mut map)?; },
                     }
@@ -467,7 +471,7 @@ impl<'de> serde::Deserialize<'de> for RangeAllocation {
 
                 Ok(RangeAllocation {
                     data: value_data.ok_or_else(|| serde::de::Error::missing_field("data"))?,
-                    metadata: value_metadata,
+                    metadata: value_metadata.ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
                     range: value_range.ok_or_else(|| serde::de::Error::missing_field("range"))?,
                 })
             }
@@ -491,15 +495,12 @@ impl serde::Serialize for RangeAllocation {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            4 +
-            self.metadata.as_ref().map_or(0, |_| 1),
+            5,
         )?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "apiVersion", <Self as k8s_openapi::Resource>::API_VERSION)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "kind", <Self as k8s_openapi::Resource>::KIND)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "data", &self.data)?;
-        if let Some(value) = &self.metadata {
-            serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", value)?;
-        }
+        serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", &self.metadata)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "range", &self.range)?;
         serde::ser::SerializeStruct::end(state)
     }

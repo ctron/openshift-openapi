@@ -10,17 +10,15 @@ pub(crate) fn remove_legacy_gvk(spec: &mut crate::swagger20::Spec) -> Result<(),
             continue;
         }
 
-        if let Some(gvks) = &mut v.kubernetes_group_kind_versions {
-            gvks.retain(|gvk| {
-                // drop the legacy, empty group
-                if gvk.group.is_empty() {
-                    found = true;
-                    false
-                } else {
-                    true
-                }
-            });
-        }
+        v.kubernetes_group_kind_versions.retain(|gvk| {
+            // drop the legacy, empty group
+            if gvk.group.is_empty() {
+                found = true;
+                false
+            } else {
+                true
+            }
+        });
     }
 
     if found {
@@ -52,19 +50,15 @@ pub(crate) fn fix_imagestream_secrets_list(
             continue;
         }
 
-        if let Some(gvks) = &mut v.kubernetes_group_kind_versions {
-            if gvks.len() > 1 {
-                gvks.retain(|gvk| {
-                    // drop the legacy, empty group
-                    if gvk.group == "image.openshift.io" && gvk.kind == "SecretList" {
-                        found = true;
-                        false
-                    } else {
-                        true
-                    }
-                });
+        v.kubernetes_group_kind_versions.retain(|gvk| {
+            // drop the legacy, empty group
+            if gvk.group == "image.openshift.io" && gvk.kind == "SecretList" {
+                found = true;
+                false
+            } else {
+                true
             }
-        }
+        });
     }
 
     if found {

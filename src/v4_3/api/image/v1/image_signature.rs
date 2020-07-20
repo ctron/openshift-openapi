@@ -22,7 +22,7 @@ pub struct ImageSignature {
     pub issued_to: Option<crate::api::image::v1::SignatureSubject>,
 
     /// Standard object's metadata.
-    pub metadata: Option<k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta>,
+    pub metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta,
 
     /// Contains claims from the signature.
     pub signed_claims: Option<std::collections::BTreeMap<String, String>>,
@@ -114,8 +114,12 @@ impl k8s_openapi::Resource for ImageSignature {
 impl k8s_openapi::Metadata for ImageSignature {
     type Ty = k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta;
 
-    fn metadata(&self) -> Option<&<Self as k8s_openapi::Metadata>::Ty> {
-        self.metadata.as_ref()
+    fn metadata(&self) -> &<Self as k8s_openapi::Metadata>::Ty {
+        &self.metadata
+    }
+
+    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+        &mut self.metadata
     }
 }
 
@@ -210,7 +214,7 @@ impl<'de> serde::Deserialize<'de> for ImageSignature {
                         Field::Key_image_identity => value_image_identity = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_issued_by => value_issued_by = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_issued_to => value_issued_to = serde::de::MapAccess::next_value(&mut map)?,
-                        Field::Key_metadata => value_metadata = serde::de::MapAccess::next_value(&mut map)?,
+                        Field::Key_metadata => value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Key_signed_claims => value_signed_claims = serde::de::MapAccess::next_value(&mut map)?,
                         Field::Key_type_ => value_type_ = Some(serde::de::MapAccess::next_value(&mut map)?),
                         Field::Other => { let _: serde::de::IgnoredAny = serde::de::MapAccess::next_value(&mut map)?; },
@@ -224,7 +228,7 @@ impl<'de> serde::Deserialize<'de> for ImageSignature {
                     image_identity: value_image_identity,
                     issued_by: value_issued_by,
                     issued_to: value_issued_to,
-                    metadata: value_metadata,
+                    metadata: value_metadata.ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
                     signed_claims: value_signed_claims,
                     type_: value_type_.ok_or_else(|| serde::de::Error::missing_field("type"))?,
                 })
@@ -255,13 +259,12 @@ impl serde::Serialize for ImageSignature {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
         let mut state = serializer.serialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            4 +
+            5 +
             self.conditions.as_ref().map_or(0, |_| 1) +
             self.created.as_ref().map_or(0, |_| 1) +
             self.image_identity.as_ref().map_or(0, |_| 1) +
             self.issued_by.as_ref().map_or(0, |_| 1) +
             self.issued_to.as_ref().map_or(0, |_| 1) +
-            self.metadata.as_ref().map_or(0, |_| 1) +
             self.signed_claims.as_ref().map_or(0, |_| 1),
         )?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "apiVersion", <Self as k8s_openapi::Resource>::API_VERSION)?;
@@ -282,9 +285,7 @@ impl serde::Serialize for ImageSignature {
         if let Some(value) = &self.issued_to {
             serde::ser::SerializeStruct::serialize_field(&mut state, "issuedTo", value)?;
         }
-        if let Some(value) = &self.metadata {
-            serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", value)?;
-        }
+        serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", &self.metadata)?;
         if let Some(value) = &self.signed_claims {
             serde::ser::SerializeStruct::serialize_field(&mut state, "signedClaims", value)?;
         }
