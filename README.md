@@ -10,7 +10,7 @@ resources and operations in the OpenShift client API, auto-generated from the Op
 
 ## Builds on `k8s_openapi`
 
-This work is based on the wonderful work from [https://github.com/]Arnavion/k8s-openapi](https://github.com/Arnavion/k8s-openapi).
+This work is based on the wonderful work from [Arnavion/k8s-openapi](https://github.com/Arnavion/k8s-openapi).
 It does not contain the Kubernetes APIs directly, this is handled by the `k8s_openapi` crate. It only
 contains the types added by OpenShift (like `Route` and `ImageStream`) and references the existing
 Kubernetes resources (like `Pod` and `Deployment`) from the `k8s_openapi` crate.
