@@ -3,7 +3,7 @@ name = "openshift-openapi"
 license = "Apache-2.0"
 categories = ["api-bindings", "web-programming::http-client"]
 description = "Bindings for the OpenShift client API"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Jens Reimann <jreimann@redhat.com>"]
 edition = "2018"
 keywords = ["client", "kubernetes", "k8s", "openshift", "http"]
@@ -21,7 +21,7 @@ http = { version = "0.2", optional = true }
 percent-encoding = { version = "2", optional = true }
 serde = "1"
 serde_json = "1"
-serde-value = "0.6"
+serde-value = "0.7"
 url = { version = "2", optional = true }
 
 [features]
