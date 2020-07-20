@@ -16,10 +16,6 @@ the Kubernetes APIs, that is handled by the `k8s_openapi` crate. It only contain
 (like `Route` and `ImageStream`) and references the existing Kubernetes (like `Pod` and `Deployment`) from the
 `k8s_openapi` crate.
 
-**Note**: This currently uses a patched version `k8s-openapi`. A few changes to the
-code generator had been necessary. This is currently being tracked in PR https://github.com/Arnavion/k8s-openapi/pull/68.
-Use at your own risk!
-
 ## OpenShift Versions
 
 | OpenShift Version | Feature | Kubernetes Version | `k8s_openapi` Feature |

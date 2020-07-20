@@ -14,7 +14,7 @@ reqwest = { version = "0.10", features = ["blocking", "json"] }
 serde = "1"
 serde_derive = "1"
 
-k8s-openapi-codegen-common = { version = "0.8", features = ["serde"] }
+k8s-openapi-codegen-common = { version = "0.9", features = ["serde"] }
 
 [patch.crates-io]
-k8s-openapi-codegen-common = { git = "https://github.com/Arnavion/k8s-openapi", branch="master" }
+#k8s-openapi-codegen-common = { git = "https://github.com/Arnavion/k8s-openapi", branch="master" }
