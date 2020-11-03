@@ -3,7 +3,7 @@ name = "openshift-openapi"
 license = "Apache-2.0"
 categories = ["api-bindings", "web-programming::http-client"]
 description = "Bindings for the OpenShift client API"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Jens Reimann <jreimann@redhat.com>"]
 edition = "2018"
 keywords = ["client", "kubernetes", "k8s", "openshift", "http"]
@@ -12,7 +12,7 @@ repository = "https://github.com/ctron/openshift-openapi"
 
 [dependencies]
 
-k8s-openapi = { version = "0.9" }
+k8s-openapi = { version = "0.10" }
 
 base64 = "0.12"
 bytes = "0.5"
