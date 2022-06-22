@@ -691,6 +691,9 @@ impl k8s_openapi::Resource for Route {
     const GROUP: &'static str = "route.openshift.io";
     const KIND: &'static str = "Route";
     const VERSION: &'static str = "v1";
+    // fixed `Resource` impl
+    const URL_PATH_SEGMENT: &'static str = "routes";
+    type Scope = k8s_openapi::ClusterResourceScope;
 }
 
 impl k8s_openapi::ListableResource for Route {

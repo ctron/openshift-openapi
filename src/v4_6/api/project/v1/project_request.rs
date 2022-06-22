@@ -158,6 +158,9 @@ impl k8s_openapi::Resource for ProjectRequest {
     const GROUP: &'static str = "project.openshift.io";
     const KIND: &'static str = "ProjectRequest";
     const VERSION: &'static str = "v1";
+    // fixed `Resource` impl
+    const URL_PATH_SEGMENT: &'static str = "projectrequests";
+    type Scope = k8s_openapi::ClusterResourceScope;
 }
 
 impl k8s_openapi::Metadata for ProjectRequest {

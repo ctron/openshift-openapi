@@ -2,8 +2,7 @@
 
 /// DeploymentLog represents the logs for a deployment
 #[derive(Clone, Debug, Default, PartialEq)]
-pub struct DeploymentLog {
-}
+pub struct DeploymentLog {}
 
 // Begin apps.openshift.io/v1/DeploymentLog
 
@@ -32,7 +31,15 @@ impl DeploymentLog {
         name: &str,
         namespace: &str,
         optional: ReadNamespacedDeploymentConfigLogOptional<'_>,
-    ) -> Result<(http::Request<Vec<u8>>, fn(http::StatusCode) -> k8s_openapi::ResponseBody<ReadNamespacedDeploymentConfigLogResponse>), k8s_openapi::RequestError> {
+    ) -> Result<
+        (
+            http::Request<Vec<u8>>,
+            fn(
+                http::StatusCode,
+            ) -> k8s_openapi::ResponseBody<ReadNamespacedDeploymentConfigLogResponse>,
+        ),
+        k8s_openapi::RequestError,
+    > {
         let ReadNamespacedDeploymentConfigLogOptional {
             container,
             follow,
@@ -45,9 +52,16 @@ impl DeploymentLog {
             timestamps,
             version,
         } = optional;
-        let __url = format!("/apis/apps.openshift.io/v1/namespaces/{namespace}/deploymentconfigs/{name}/log?",
-            name = k8s_openapi::percent_encoding::percent_encode(name.as_bytes(), k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET),
-            namespace = k8s_openapi::percent_encoding::percent_encode(namespace.as_bytes(), k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET),
+        let __url = format!(
+            "/apis/apps.openshift.io/v1/namespaces/{namespace}/deploymentconfigs/{name}/log?",
+            name = k8s_openapi::percent_encoding::percent_encode(
+                name.as_bytes(),
+                k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET
+            ),
+            namespace = k8s_openapi::percent_encoding::percent_encode(
+                namespace.as_bytes(),
+                k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET
+            ),
         );
         let mut __query_pairs = k8s_openapi::url::form_urlencoded::Serializer::new(__url);
         if let Some(container) = container {
@@ -127,30 +141,41 @@ pub enum ReadNamespacedDeploymentConfigLogResponse {
 
 #[cfg(feature = "api")]
 impl k8s_openapi::Response for ReadNamespacedDeploymentConfigLogResponse {
-    fn try_from_parts(status_code: http::StatusCode, buf: &[u8]) -> Result<(Self, usize), k8s_openapi::ResponseError> {
+    fn try_from_parts(
+        status_code: http::StatusCode,
+        buf: &[u8],
+    ) -> Result<(Self, usize), k8s_openapi::ResponseError> {
         match status_code {
             http::StatusCode::OK => {
                 let result = match serde_json::from_slice(buf) {
                     Ok(value) => value,
-                    Err(ref err) if err.is_eof() => return Err(k8s_openapi::ResponseError::NeedMoreData),
+                    Err(ref err) if err.is_eof() => {
+                        return Err(k8s_openapi::ResponseError::NeedMoreData)
+                    }
                     Err(err) => return Err(k8s_openapi::ResponseError::Json(err)),
                 };
-                Ok((ReadNamespacedDeploymentConfigLogResponse::Ok(result), buf.len()))
-            },
+                Ok((
+                    ReadNamespacedDeploymentConfigLogResponse::Ok(result),
+                    buf.len(),
+                ))
+            }
             _ => {
-                let (result, read) =
-                    if buf.is_empty() {
-                        (Ok(None), 0)
-                    }
-                    else {
-                        match serde_json::from_slice(buf) {
-                            Ok(value) => (Ok(Some(value)), buf.len()),
-                            Err(ref err) if err.is_eof() => return Err(k8s_openapi::ResponseError::NeedMoreData),
-                            Err(err) => (Err(err), 0),
+                let (result, read) = if buf.is_empty() {
+                    (Ok(None), 0)
+                } else {
+                    match serde_json::from_slice(buf) {
+                        Ok(value) => (Ok(Some(value)), buf.len()),
+                        Err(ref err) if err.is_eof() => {
+                            return Err(k8s_openapi::ResponseError::NeedMoreData)
                         }
-                    };
-                Ok((ReadNamespacedDeploymentConfigLogResponse::Other(result), read))
-            },
+                        Err(err) => (Err(err), 0),
+                    }
+                };
+                Ok((
+                    ReadNamespacedDeploymentConfigLogResponse::Other(result),
+                    read,
+                ))
+            }
         }
     }
 }
@@ -162,10 +187,16 @@ impl k8s_openapi::Resource for DeploymentLog {
     const GROUP: &'static str = "apps.openshift.io";
     const KIND: &'static str = "DeploymentLog";
     const VERSION: &'static str = "v1";
+    // fixed `Resource` impl
+    const URL_PATH_SEGMENT: &'static str = "log";
+    type Scope = k8s_openapi::SubResourceScope;
 }
 
 impl<'de> serde::Deserialize<'de> for DeploymentLog {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: serde::Deserializer<'de> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
         #[allow(non_camel_case_types)]
         enum Field {
             Key_api_version,
@@ -174,7 +205,10 @@ impl<'de> serde::Deserialize<'de> for DeploymentLog {
         }
 
         impl<'de> serde::Deserialize<'de> for Field {
-            fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: serde::Deserializer<'de> {
+            fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
                 struct Visitor;
 
                 impl<'de> serde::de::Visitor<'de> for Visitor {
@@ -184,7 +218,10 @@ impl<'de> serde::Deserialize<'de> for DeploymentLog {
                         f.write_str("field identifier")
                     }
 
-                    fn visit_str<E>(self, v: &str) -> Result<Self::Value, E> where E: serde::de::Error {
+                    fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+                    where
+                        E: serde::de::Error,
+                    {
                         Ok(match v {
                             "apiVersion" => Field::Key_api_version,
                             "kind" => Field::Key_kind,
@@ -206,50 +243,68 @@ impl<'de> serde::Deserialize<'de> for DeploymentLog {
                 f.write_str(<Self::Value as k8s_openapi::Resource>::KIND)
             }
 
-            fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error> where A: serde::de::MapAccess<'de> {
-
+            fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
+            where
+                A: serde::de::MapAccess<'de>,
+            {
                 while let Some(key) = serde::de::MapAccess::next_key::<Field>(&mut map)? {
                     match key {
                         Field::Key_api_version => {
-                            let value_api_version: String = serde::de::MapAccess::next_value(&mut map)?;
-                            if value_api_version != <Self::Value as k8s_openapi::Resource>::API_VERSION {
-                                return Err(serde::de::Error::invalid_value(serde::de::Unexpected::Str(&value_api_version), &<Self::Value as k8s_openapi::Resource>::API_VERSION));
+                            let value_api_version: String =
+                                serde::de::MapAccess::next_value(&mut map)?;
+                            if value_api_version
+                                != <Self::Value as k8s_openapi::Resource>::API_VERSION
+                            {
+                                return Err(serde::de::Error::invalid_value(
+                                    serde::de::Unexpected::Str(&value_api_version),
+                                    &<Self::Value as k8s_openapi::Resource>::API_VERSION,
+                                ));
                             }
-                        },
+                        }
                         Field::Key_kind => {
                             let value_kind: String = serde::de::MapAccess::next_value(&mut map)?;
                             if value_kind != <Self::Value as k8s_openapi::Resource>::KIND {
-                                return Err(serde::de::Error::invalid_value(serde::de::Unexpected::Str(&value_kind), &<Self::Value as k8s_openapi::Resource>::KIND));
+                                return Err(serde::de::Error::invalid_value(
+                                    serde::de::Unexpected::Str(&value_kind),
+                                    &<Self::Value as k8s_openapi::Resource>::KIND,
+                                ));
                             }
-                        },
-                        Field::Other => { let _: serde::de::IgnoredAny = serde::de::MapAccess::next_value(&mut map)?; },
+                        }
+                        Field::Other => {
+                            let _: serde::de::IgnoredAny =
+                                serde::de::MapAccess::next_value(&mut map)?;
+                        }
                     }
                 }
 
-                Ok(DeploymentLog {
-                })
+                Ok(DeploymentLog {})
             }
         }
 
         deserializer.deserialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            &[
-                "apiVersion",
-                "kind",
-            ],
+            &["apiVersion", "kind"],
             Visitor,
         )
     }
 }
 
 impl serde::Serialize for DeploymentLog {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
-        let mut state = serializer.serialize_struct(
-            <Self as k8s_openapi::Resource>::KIND,
-            2,
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut state = serializer.serialize_struct(<Self as k8s_openapi::Resource>::KIND, 2)?;
+        serde::ser::SerializeStruct::serialize_field(
+            &mut state,
+            "apiVersion",
+            <Self as k8s_openapi::Resource>::API_VERSION,
         )?;
-        serde::ser::SerializeStruct::serialize_field(&mut state, "apiVersion", <Self as k8s_openapi::Resource>::API_VERSION)?;
-        serde::ser::SerializeStruct::serialize_field(&mut state, "kind", <Self as k8s_openapi::Resource>::KIND)?;
+        serde::ser::SerializeStruct::serialize_field(
+            &mut state,
+            "kind",
+            <Self as k8s_openapi::Resource>::KIND,
+        )?;
         serde::ser::SerializeStruct::end(state)
     }
 }

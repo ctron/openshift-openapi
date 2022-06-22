@@ -398,6 +398,9 @@ impl k8s_openapi::Resource for OAuthClient {
     const GROUP: &'static str = "oauth.openshift.io";
     const KIND: &'static str = "OAuthClient";
     const VERSION: &'static str = "v1";
+    // fixed `Resource` impl
+    const URL_PATH_SEGMENT: &'static str = "oauthclients";
+    type Scope = k8s_openapi::ClusterResourceScope;
 }
 
 impl k8s_openapi::ListableResource for OAuthClient {

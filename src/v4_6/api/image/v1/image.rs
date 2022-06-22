@@ -398,6 +398,9 @@ impl k8s_openapi::Resource for Image {
     const GROUP: &'static str = "image.openshift.io";
     const KIND: &'static str = "Image";
     const VERSION: &'static str = "v1";
+    // fixed `Resource` impl
+    const URL_PATH_SEGMENT: &'static str = "images";
+    type Scope = k8s_openapi::ClusterResourceScope;
 }
 
 impl k8s_openapi::ListableResource for Image {

@@ -490,6 +490,9 @@ impl k8s_openapi::Resource for EgressNetworkPolicy {
     const GROUP: &'static str = "network.openshift.io";
     const KIND: &'static str = "EgressNetworkPolicy";
     const VERSION: &'static str = "v1";
+    // fixed `Resource` impl
+    const URL_PATH_SEGMENT: &'static str = "egressnetworkpolicies";
+    type Scope = k8s_openapi::NamespaceResourceScope;
 }
 
 impl k8s_openapi::ListableResource for EgressNetworkPolicy {

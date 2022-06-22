@@ -193,6 +193,9 @@ impl k8s_openapi::Resource for BuildRequest {
     const GROUP: &'static str = "build.openshift.io";
     const KIND: &'static str = "BuildRequest";
     const VERSION: &'static str = "v1";
+    // fixed `Resource` impl
+    const URL_PATH_SEGMENT: &'static str = "instantiate";
+    type Scope = k8s_openapi::SubResourceScope;
 }
 
 impl k8s_openapi::Metadata for BuildRequest {

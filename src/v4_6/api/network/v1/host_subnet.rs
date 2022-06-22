@@ -386,6 +386,9 @@ impl k8s_openapi::Resource for HostSubnet {
     const GROUP: &'static str = "network.openshift.io";
     const KIND: &'static str = "HostSubnet";
     const VERSION: &'static str = "v1";
+    // fixed `Resource` impl
+    const URL_PATH_SEGMENT: &'static str = "hostsubnets";
+    type Scope = k8s_openapi::ClusterResourceScope;
 }
 
 impl k8s_openapi::ListableResource for HostSubnet {

@@ -60,6 +60,9 @@ impl k8s_openapi::Resource for PodSecurityPolicySubjectReview {
     const GROUP: &'static str = "security.openshift.io";
     const KIND: &'static str = "PodSecurityPolicySubjectReview";
     const VERSION: &'static str = "v1";
+    // fixed `Resource` impl
+    const URL_PATH_SEGMENT: &'static str = "podsecuritypolicysubjectreviews";
+    type Scope = k8s_openapi::NamespaceResourceScope;
 }
 
 impl<'de> serde::Deserialize<'de> for PodSecurityPolicySubjectReview {

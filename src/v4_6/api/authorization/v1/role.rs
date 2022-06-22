@@ -35,9 +35,19 @@ impl Role {
         namespace: &str,
         body: &crate::api::authorization::v1::Role,
         optional: k8s_openapi::CreateOptional<'_>,
-    ) -> Result<(http::Request<Vec<u8>>, fn(http::StatusCode) -> k8s_openapi::ResponseBody<k8s_openapi::CreateResponse<Self>>), k8s_openapi::RequestError> {
-        let __url = format!("/apis/authorization.openshift.io/v1/namespaces/{namespace}/roles?",
-            namespace = k8s_openapi::percent_encoding::percent_encode(namespace.as_bytes(), k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET),
+    ) -> Result<
+        (
+            http::Request<Vec<u8>>,
+            fn(http::StatusCode) -> k8s_openapi::ResponseBody<k8s_openapi::CreateResponse<Self>>,
+        ),
+        k8s_openapi::RequestError,
+    > {
+        let __url = format!(
+            "/apis/authorization.openshift.io/v1/namespaces/{namespace}/roles?",
+            namespace = k8s_openapi::percent_encoding::percent_encode(
+                namespace.as_bytes(),
+                k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET
+            ),
         );
         let mut __query_pairs = k8s_openapi::url::form_urlencoded::Serializer::new(__url);
         optional.__serialize(&mut __query_pairs);
@@ -45,7 +55,10 @@ impl Role {
 
         let __request = http::Request::post(__url);
         let __body = serde_json::to_vec(body).map_err(k8s_openapi::RequestError::Json)?;
-        let __request = __request.header(http::header::CONTENT_TYPE, http::header::HeaderValue::from_static("application/json"));
+        let __request = __request.header(
+            http::header::CONTENT_TYPE,
+            http::header::HeaderValue::from_static("application/json"),
+        );
         match __request.body(__body) {
             Ok(request) => Ok((request, k8s_openapi::ResponseBody::new)),
             Err(err) => Err(k8s_openapi::RequestError::Http(err)),
@@ -78,15 +91,31 @@ impl Role {
         name: &str,
         namespace: &str,
         optional: k8s_openapi::DeleteOptional<'_>,
-    ) -> Result<(http::Request<Vec<u8>>, fn(http::StatusCode) -> k8s_openapi::ResponseBody<k8s_openapi::DeleteResponse<Self>>), k8s_openapi::RequestError> {
-        let __url = format!("/apis/authorization.openshift.io/v1/namespaces/{namespace}/roles/{name}",
-            name = k8s_openapi::percent_encoding::percent_encode(name.as_bytes(), k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET),
-            namespace = k8s_openapi::percent_encoding::percent_encode(namespace.as_bytes(), k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET),
+    ) -> Result<
+        (
+            http::Request<Vec<u8>>,
+            fn(http::StatusCode) -> k8s_openapi::ResponseBody<k8s_openapi::DeleteResponse<Self>>,
+        ),
+        k8s_openapi::RequestError,
+    > {
+        let __url = format!(
+            "/apis/authorization.openshift.io/v1/namespaces/{namespace}/roles/{name}",
+            name = k8s_openapi::percent_encoding::percent_encode(
+                name.as_bytes(),
+                k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET
+            ),
+            namespace = k8s_openapi::percent_encoding::percent_encode(
+                namespace.as_bytes(),
+                k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET
+            ),
         );
 
         let __request = http::Request::delete(__url);
         let __body = serde_json::to_vec(&optional).map_err(k8s_openapi::RequestError::Json)?;
-        let __request = __request.header(http::header::CONTENT_TYPE, http::header::HeaderValue::from_static("application/json"));
+        let __request = __request.header(
+            http::header::CONTENT_TYPE,
+            http::header::HeaderValue::from_static("application/json"),
+        );
         match __request.body(__body) {
             Ok(request) => Ok((request, k8s_openapi::ResponseBody::new)),
             Err(err) => Err(k8s_openapi::RequestError::Http(err)),
@@ -116,9 +145,19 @@ impl Role {
     pub fn list_namespaced_role(
         namespace: &str,
         optional: k8s_openapi::ListOptional<'_>,
-    ) -> Result<(http::Request<Vec<u8>>, fn(http::StatusCode) -> k8s_openapi::ResponseBody<k8s_openapi::ListResponse<Self>>), k8s_openapi::RequestError> {
-        let __url = format!("/apis/authorization.openshift.io/v1/namespaces/{namespace}/roles?",
-            namespace = k8s_openapi::percent_encoding::percent_encode(namespace.as_bytes(), k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET),
+    ) -> Result<
+        (
+            http::Request<Vec<u8>>,
+            fn(http::StatusCode) -> k8s_openapi::ResponseBody<k8s_openapi::ListResponse<Self>>,
+        ),
+        k8s_openapi::RequestError,
+    > {
+        let __url = format!(
+            "/apis/authorization.openshift.io/v1/namespaces/{namespace}/roles?",
+            namespace = k8s_openapi::percent_encoding::percent_encode(
+                namespace.as_bytes(),
+                k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET
+            ),
         );
         let mut __query_pairs = k8s_openapi::url::form_urlencoded::Serializer::new(__url);
         optional.__serialize(&mut __query_pairs);
@@ -150,7 +189,13 @@ impl Role {
     #[cfg(feature = "api")]
     pub fn list_role_for_all_namespaces(
         optional: k8s_openapi::ListOptional<'_>,
-    ) -> Result<(http::Request<Vec<u8>>, fn(http::StatusCode) -> k8s_openapi::ResponseBody<k8s_openapi::ListResponse<Self>>), k8s_openapi::RequestError> {
+    ) -> Result<
+        (
+            http::Request<Vec<u8>>,
+            fn(http::StatusCode) -> k8s_openapi::ResponseBody<k8s_openapi::ListResponse<Self>>,
+        ),
+        k8s_openapi::RequestError,
+    > {
         let __url = "/apis/authorization.openshift.io/v1/roles?".to_owned();
         let mut __query_pairs = k8s_openapi::url::form_urlencoded::Serializer::new(__url);
         optional.__serialize(&mut __query_pairs);
@@ -193,10 +238,23 @@ impl Role {
         namespace: &str,
         body: &k8s_openapi::apimachinery::pkg::apis::meta::v1::Patch,
         optional: k8s_openapi::PatchOptional<'_>,
-    ) -> Result<(http::Request<Vec<u8>>, fn(http::StatusCode) -> k8s_openapi::ResponseBody<k8s_openapi::PatchResponse<Self>>), k8s_openapi::RequestError> {
-        let __url = format!("/apis/authorization.openshift.io/v1/namespaces/{namespace}/roles/{name}?",
-            name = k8s_openapi::percent_encoding::percent_encode(name.as_bytes(), k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET),
-            namespace = k8s_openapi::percent_encoding::percent_encode(namespace.as_bytes(), k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET),
+    ) -> Result<
+        (
+            http::Request<Vec<u8>>,
+            fn(http::StatusCode) -> k8s_openapi::ResponseBody<k8s_openapi::PatchResponse<Self>>,
+        ),
+        k8s_openapi::RequestError,
+    > {
+        let __url = format!(
+            "/apis/authorization.openshift.io/v1/namespaces/{namespace}/roles/{name}?",
+            name = k8s_openapi::percent_encoding::percent_encode(
+                name.as_bytes(),
+                k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET
+            ),
+            namespace = k8s_openapi::percent_encoding::percent_encode(
+                namespace.as_bytes(),
+                k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET
+            ),
         );
         let mut __query_pairs = k8s_openapi::url::form_urlencoded::Serializer::new(__url);
         optional.__serialize(&mut __query_pairs);
@@ -204,11 +262,20 @@ impl Role {
 
         let __request = http::Request::patch(__url);
         let __body = serde_json::to_vec(body).map_err(k8s_openapi::RequestError::Json)?;
-        let __request = __request.header(http::header::CONTENT_TYPE, http::header::HeaderValue::from_static(match body {
-            k8s_openapi::apimachinery::pkg::apis::meta::v1::Patch::Json(_) => "application/json-patch+json",
-            k8s_openapi::apimachinery::pkg::apis::meta::v1::Patch::Merge(_) => "application/merge-patch+json",
-            k8s_openapi::apimachinery::pkg::apis::meta::v1::Patch::StrategicMerge(_) => "application/strategic-merge-patch+json",
-        }));
+        let __request = __request.header(
+            http::header::CONTENT_TYPE,
+            http::header::HeaderValue::from_static(match body {
+                k8s_openapi::apimachinery::pkg::apis::meta::v1::Patch::Json(_) => {
+                    "application/json-patch+json"
+                }
+                k8s_openapi::apimachinery::pkg::apis::meta::v1::Patch::Merge(_) => {
+                    "application/merge-patch+json"
+                }
+                k8s_openapi::apimachinery::pkg::apis::meta::v1::Patch::StrategicMerge(_) => {
+                    "application/strategic-merge-patch+json"
+                }
+            }),
+        );
         match __request.body(__body) {
             Ok(request) => Ok((request, k8s_openapi::ResponseBody::new)),
             Err(err) => Err(k8s_openapi::RequestError::Http(err)),
@@ -241,13 +308,24 @@ impl Role {
         name: &str,
         namespace: &str,
         optional: ReadNamespacedRoleOptional<'_>,
-    ) -> Result<(http::Request<Vec<u8>>, fn(http::StatusCode) -> k8s_openapi::ResponseBody<ReadNamespacedRoleResponse>), k8s_openapi::RequestError> {
-        let ReadNamespacedRoleOptional {
-            pretty,
-        } = optional;
-        let __url = format!("/apis/authorization.openshift.io/v1/namespaces/{namespace}/roles/{name}?",
-            name = k8s_openapi::percent_encoding::percent_encode(name.as_bytes(), k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET),
-            namespace = k8s_openapi::percent_encoding::percent_encode(namespace.as_bytes(), k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET),
+    ) -> Result<
+        (
+            http::Request<Vec<u8>>,
+            fn(http::StatusCode) -> k8s_openapi::ResponseBody<ReadNamespacedRoleResponse>,
+        ),
+        k8s_openapi::RequestError,
+    > {
+        let ReadNamespacedRoleOptional { pretty } = optional;
+        let __url = format!(
+            "/apis/authorization.openshift.io/v1/namespaces/{namespace}/roles/{name}?",
+            name = k8s_openapi::percent_encoding::percent_encode(
+                name.as_bytes(),
+                k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET
+            ),
+            namespace = k8s_openapi::percent_encoding::percent_encode(
+                namespace.as_bytes(),
+                k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET
+            ),
         );
         let mut __query_pairs = k8s_openapi::url::form_urlencoded::Serializer::new(__url);
         if let Some(pretty) = pretty {
@@ -282,30 +360,35 @@ pub enum ReadNamespacedRoleResponse {
 
 #[cfg(feature = "api")]
 impl k8s_openapi::Response for ReadNamespacedRoleResponse {
-    fn try_from_parts(status_code: http::StatusCode, buf: &[u8]) -> Result<(Self, usize), k8s_openapi::ResponseError> {
+    fn try_from_parts(
+        status_code: http::StatusCode,
+        buf: &[u8],
+    ) -> Result<(Self, usize), k8s_openapi::ResponseError> {
         match status_code {
             http::StatusCode::OK => {
                 let result = match serde_json::from_slice(buf) {
                     Ok(value) => value,
-                    Err(ref err) if err.is_eof() => return Err(k8s_openapi::ResponseError::NeedMoreData),
+                    Err(ref err) if err.is_eof() => {
+                        return Err(k8s_openapi::ResponseError::NeedMoreData)
+                    }
                     Err(err) => return Err(k8s_openapi::ResponseError::Json(err)),
                 };
                 Ok((ReadNamespacedRoleResponse::Ok(result), buf.len()))
-            },
+            }
             _ => {
-                let (result, read) =
-                    if buf.is_empty() {
-                        (Ok(None), 0)
-                    }
-                    else {
-                        match serde_json::from_slice(buf) {
-                            Ok(value) => (Ok(Some(value)), buf.len()),
-                            Err(ref err) if err.is_eof() => return Err(k8s_openapi::ResponseError::NeedMoreData),
-                            Err(err) => (Err(err), 0),
+                let (result, read) = if buf.is_empty() {
+                    (Ok(None), 0)
+                } else {
+                    match serde_json::from_slice(buf) {
+                        Ok(value) => (Ok(Some(value)), buf.len()),
+                        Err(ref err) if err.is_eof() => {
+                            return Err(k8s_openapi::ResponseError::NeedMoreData)
                         }
-                    };
+                        Err(err) => (Err(err), 0),
+                    }
+                };
                 Ok((ReadNamespacedRoleResponse::Other(result), read))
-            },
+            }
         }
     }
 }
@@ -338,10 +421,23 @@ impl Role {
         namespace: &str,
         body: &crate::api::authorization::v1::Role,
         optional: k8s_openapi::ReplaceOptional<'_>,
-    ) -> Result<(http::Request<Vec<u8>>, fn(http::StatusCode) -> k8s_openapi::ResponseBody<k8s_openapi::ReplaceResponse<Self>>), k8s_openapi::RequestError> {
-        let __url = format!("/apis/authorization.openshift.io/v1/namespaces/{namespace}/roles/{name}?",
-            name = k8s_openapi::percent_encoding::percent_encode(name.as_bytes(), k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET),
-            namespace = k8s_openapi::percent_encoding::percent_encode(namespace.as_bytes(), k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET),
+    ) -> Result<
+        (
+            http::Request<Vec<u8>>,
+            fn(http::StatusCode) -> k8s_openapi::ResponseBody<k8s_openapi::ReplaceResponse<Self>>,
+        ),
+        k8s_openapi::RequestError,
+    > {
+        let __url = format!(
+            "/apis/authorization.openshift.io/v1/namespaces/{namespace}/roles/{name}?",
+            name = k8s_openapi::percent_encoding::percent_encode(
+                name.as_bytes(),
+                k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET
+            ),
+            namespace = k8s_openapi::percent_encoding::percent_encode(
+                namespace.as_bytes(),
+                k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET
+            ),
         );
         let mut __query_pairs = k8s_openapi::url::form_urlencoded::Serializer::new(__url);
         optional.__serialize(&mut __query_pairs);
@@ -349,7 +445,10 @@ impl Role {
 
         let __request = http::Request::put(__url);
         let __body = serde_json::to_vec(body).map_err(k8s_openapi::RequestError::Json)?;
-        let __request = __request.header(http::header::CONTENT_TYPE, http::header::HeaderValue::from_static("application/json"));
+        let __request = __request.header(
+            http::header::CONTENT_TYPE,
+            http::header::HeaderValue::from_static("application/json"),
+        );
         match __request.body(__body) {
             Ok(request) => Ok((request, k8s_openapi::ResponseBody::new)),
             Err(err) => Err(k8s_openapi::RequestError::Http(err)),
@@ -379,9 +478,19 @@ impl Role {
     pub fn watch_namespaced_role(
         namespace: &str,
         optional: k8s_openapi::WatchOptional<'_>,
-    ) -> Result<(http::Request<Vec<u8>>, fn(http::StatusCode) -> k8s_openapi::ResponseBody<k8s_openapi::WatchResponse<Self>>), k8s_openapi::RequestError> {
-        let __url = format!("/apis/authorization.openshift.io/v1/namespaces/{namespace}/roles?",
-            namespace = k8s_openapi::percent_encoding::percent_encode(namespace.as_bytes(), k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET),
+    ) -> Result<
+        (
+            http::Request<Vec<u8>>,
+            fn(http::StatusCode) -> k8s_openapi::ResponseBody<k8s_openapi::WatchResponse<Self>>,
+        ),
+        k8s_openapi::RequestError,
+    > {
+        let __url = format!(
+            "/apis/authorization.openshift.io/v1/namespaces/{namespace}/roles?",
+            namespace = k8s_openapi::percent_encoding::percent_encode(
+                namespace.as_bytes(),
+                k8s_openapi::percent_encoding2::PATH_SEGMENT_ENCODE_SET
+            ),
         );
         let mut __query_pairs = k8s_openapi::url::form_urlencoded::Serializer::new(__url);
         optional.__serialize(&mut __query_pairs);
@@ -413,7 +522,13 @@ impl Role {
     #[cfg(feature = "api")]
     pub fn watch_role_for_all_namespaces(
         optional: k8s_openapi::WatchOptional<'_>,
-    ) -> Result<(http::Request<Vec<u8>>, fn(http::StatusCode) -> k8s_openapi::ResponseBody<k8s_openapi::WatchResponse<Self>>), k8s_openapi::RequestError> {
+    ) -> Result<
+        (
+            http::Request<Vec<u8>>,
+            fn(http::StatusCode) -> k8s_openapi::ResponseBody<k8s_openapi::WatchResponse<Self>>,
+        ),
+        k8s_openapi::RequestError,
+    > {
         let __url = "/apis/authorization.openshift.io/v1/roles?".to_owned();
         let mut __query_pairs = k8s_openapi::url::form_urlencoded::Serializer::new(__url);
         optional.__serialize(&mut __query_pairs);
@@ -435,6 +550,9 @@ impl k8s_openapi::Resource for Role {
     const GROUP: &'static str = "authorization.openshift.io";
     const KIND: &'static str = "Role";
     const VERSION: &'static str = "v1";
+    // fixed `Resource` impl
+    const URL_PATH_SEGMENT: &'static str = "roles";
+    type Scope = k8s_openapi::ClusterResourceScope;
 }
 
 impl k8s_openapi::ListableResource for Role {
@@ -448,13 +566,16 @@ impl k8s_openapi::Metadata for Role {
         &self.metadata
     }
 
-    fn metadata_mut(&mut self) -> &mut<Self as k8s_openapi::Metadata>::Ty {
+    fn metadata_mut(&mut self) -> &mut <Self as k8s_openapi::Metadata>::Ty {
         &mut self.metadata
     }
 }
 
 impl<'de> serde::Deserialize<'de> for Role {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: serde::Deserializer<'de> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
         #[allow(non_camel_case_types)]
         enum Field {
             Key_api_version,
@@ -465,7 +586,10 @@ impl<'de> serde::Deserialize<'de> for Role {
         }
 
         impl<'de> serde::Deserialize<'de> for Field {
-            fn deserialize<D>(deserializer: D) -> Result<Self, D::Error> where D: serde::Deserializer<'de> {
+            fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+            where
+                D: serde::Deserializer<'de>,
+            {
                 struct Visitor;
 
                 impl<'de> serde::de::Visitor<'de> for Visitor {
@@ -475,7 +599,10 @@ impl<'de> serde::Deserialize<'de> for Role {
                         f.write_str("field identifier")
                     }
 
-                    fn visit_str<E>(self, v: &str) -> Result<Self::Value, E> where E: serde::de::Error {
+                    fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+                    where
+                        E: serde::de::Error,
+                    {
                         Ok(match v {
                             "apiVersion" => Field::Key_api_version,
                             "kind" => Field::Key_kind,
@@ -499,32 +626,54 @@ impl<'de> serde::Deserialize<'de> for Role {
                 f.write_str(<Self::Value as k8s_openapi::Resource>::KIND)
             }
 
-            fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error> where A: serde::de::MapAccess<'de> {
-                let mut value_metadata: Option<k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta> = None;
+            fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
+            where
+                A: serde::de::MapAccess<'de>,
+            {
+                let mut value_metadata: Option<
+                    k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta,
+                > = None;
                 let mut value_rules: Option<Vec<crate::api::authorization::v1::PolicyRule>> = None;
 
                 while let Some(key) = serde::de::MapAccess::next_key::<Field>(&mut map)? {
                     match key {
                         Field::Key_api_version => {
-                            let value_api_version: String = serde::de::MapAccess::next_value(&mut map)?;
-                            if value_api_version != <Self::Value as k8s_openapi::Resource>::API_VERSION {
-                                return Err(serde::de::Error::invalid_value(serde::de::Unexpected::Str(&value_api_version), &<Self::Value as k8s_openapi::Resource>::API_VERSION));
+                            let value_api_version: String =
+                                serde::de::MapAccess::next_value(&mut map)?;
+                            if value_api_version
+                                != <Self::Value as k8s_openapi::Resource>::API_VERSION
+                            {
+                                return Err(serde::de::Error::invalid_value(
+                                    serde::de::Unexpected::Str(&value_api_version),
+                                    &<Self::Value as k8s_openapi::Resource>::API_VERSION,
+                                ));
                             }
-                        },
+                        }
                         Field::Key_kind => {
                             let value_kind: String = serde::de::MapAccess::next_value(&mut map)?;
                             if value_kind != <Self::Value as k8s_openapi::Resource>::KIND {
-                                return Err(serde::de::Error::invalid_value(serde::de::Unexpected::Str(&value_kind), &<Self::Value as k8s_openapi::Resource>::KIND));
+                                return Err(serde::de::Error::invalid_value(
+                                    serde::de::Unexpected::Str(&value_kind),
+                                    &<Self::Value as k8s_openapi::Resource>::KIND,
+                                ));
                             }
-                        },
-                        Field::Key_metadata => value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?),
-                        Field::Key_rules => value_rules = Some(serde::de::MapAccess::next_value(&mut map)?),
-                        Field::Other => { let _: serde::de::IgnoredAny = serde::de::MapAccess::next_value(&mut map)?; },
+                        }
+                        Field::Key_metadata => {
+                            value_metadata = Some(serde::de::MapAccess::next_value(&mut map)?)
+                        }
+                        Field::Key_rules => {
+                            value_rules = Some(serde::de::MapAccess::next_value(&mut map)?)
+                        }
+                        Field::Other => {
+                            let _: serde::de::IgnoredAny =
+                                serde::de::MapAccess::next_value(&mut map)?;
+                        }
                     }
                 }
 
                 Ok(Role {
-                    metadata: value_metadata.ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
+                    metadata: value_metadata
+                        .ok_or_else(|| serde::de::Error::missing_field("metadata"))?,
                     rules: value_rules.ok_or_else(|| serde::de::Error::missing_field("rules"))?,
                 })
             }
@@ -532,25 +681,28 @@ impl<'de> serde::Deserialize<'de> for Role {
 
         deserializer.deserialize_struct(
             <Self as k8s_openapi::Resource>::KIND,
-            &[
-                "apiVersion",
-                "kind",
-                "metadata",
-                "rules",
-            ],
+            &["apiVersion", "kind", "metadata", "rules"],
             Visitor,
         )
     }
 }
 
 impl serde::Serialize for Role {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error> where S: serde::Serializer {
-        let mut state = serializer.serialize_struct(
-            <Self as k8s_openapi::Resource>::KIND,
-            4,
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut state = serializer.serialize_struct(<Self as k8s_openapi::Resource>::KIND, 4)?;
+        serde::ser::SerializeStruct::serialize_field(
+            &mut state,
+            "apiVersion",
+            <Self as k8s_openapi::Resource>::API_VERSION,
         )?;
-        serde::ser::SerializeStruct::serialize_field(&mut state, "apiVersion", <Self as k8s_openapi::Resource>::API_VERSION)?;
-        serde::ser::SerializeStruct::serialize_field(&mut state, "kind", <Self as k8s_openapi::Resource>::KIND)?;
+        serde::ser::SerializeStruct::serialize_field(
+            &mut state,
+            "kind",
+            <Self as k8s_openapi::Resource>::KIND,
+        )?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "metadata", &self.metadata)?;
         serde::ser::SerializeStruct::serialize_field(&mut state, "rules", &self.rules)?;
         serde::ser::SerializeStruct::end(state)

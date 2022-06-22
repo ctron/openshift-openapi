@@ -685,6 +685,9 @@ impl k8s_openapi::Resource for ImageStream {
     const GROUP: &'static str = "image.openshift.io";
     const KIND: &'static str = "ImageStream";
     const VERSION: &'static str = "v1";
+    // fixed `Resource` impl
+    const URL_PATH_SEGMENT: &'static str = "imagestreams";
+    type Scope = k8s_openapi::NamespaceResourceScope;
 }
 
 impl k8s_openapi::ListableResource for ImageStream {

@@ -333,6 +333,9 @@ impl k8s_openapi::Resource for Project {
     const GROUP: &'static str = "project.openshift.io";
     const KIND: &'static str = "Project";
     const VERSION: &'static str = "v1";
+    // fixed `Resource` impl
+    const URL_PATH_SEGMENT: &'static str = "projects";
+    type Scope = k8s_openapi::ClusterResourceScope;
 }
 
 impl k8s_openapi::ListableResource for Project {

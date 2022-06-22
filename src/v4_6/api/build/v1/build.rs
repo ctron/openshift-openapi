@@ -735,6 +735,10 @@ impl k8s_openapi::Resource for Build {
     const GROUP: &'static str = "build.openshift.io";
     const KIND: &'static str = "Build";
     const VERSION: &'static str = "v1";
+
+      // fixed `Resource` impl
+    const URL_PATH_SEGMENT: &'static str = "builds";
+    type Scope = k8s_openapi::NamespaceResourceScope;
 }
 
 impl k8s_openapi::ListableResource for Build {

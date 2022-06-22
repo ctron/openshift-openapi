@@ -499,6 +499,9 @@ impl k8s_openapi::Resource for Template {
     const GROUP: &'static str = "template.openshift.io";
     const KIND: &'static str = "Template";
     const VERSION: &'static str = "v1";
+    // fixed `Resource` impl
+    const URL_PATH_SEGMENT: &'static str = "templates";
+    type Scope = k8s_openapi::ClusterResourceScope;
 }
 
 impl k8s_openapi::ListableResource for Template {

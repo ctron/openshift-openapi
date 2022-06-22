@@ -383,6 +383,9 @@ impl k8s_openapi::Resource for Identity {
     const GROUP: &'static str = "user.openshift.io";
     const KIND: &'static str = "Identity";
     const VERSION: &'static str = "v1";
+    // fixed `Resource` impl
+    const URL_PATH_SEGMENT: &'static str = "identities";
+    type Scope = k8s_openapi::ClusterResourceScope;
 }
 
 impl k8s_openapi::ListableResource for Identity {

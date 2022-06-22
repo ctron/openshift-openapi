@@ -60,6 +60,9 @@ impl k8s_openapi::Resource for SubjectRulesReview {
     const GROUP: &'static str = "authorization.openshift.io";
     const KIND: &'static str = "SubjectRulesReview";
     const VERSION: &'static str = "v1";
+    // fixed `Resource` impl
+    const URL_PATH_SEGMENT: &'static str = "subjectrulesreviews";
+    type Scope = k8s_openapi::NamespaceResourceScope;
 }
 
 impl<'de> serde::Deserialize<'de> for SubjectRulesReview {
