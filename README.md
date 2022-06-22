@@ -28,6 +28,7 @@ the mappings from OpenShift version to the Rust feature in this crate:
 | 4.3.x             | `v4_3`  | 1.16.x             | `v1_16`               |
 | 4.4.x             | `v4_4`  | 1.17.x             | `v1_17`               |
 | 4.5.x             | `v4_5`  | 1.18.x             | `v1_18`               |
+| 4.6.x             | `v4_6`  | 1.19.x             | `v1_19`               |
 
 As each OpenShift version is based on a Kubernetes version, the feature flag for the `ks8-openapi` crate
 is auto-selected, to add the appropriate Kubernetes API.

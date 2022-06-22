@@ -470,6 +470,12 @@ mod v4_5;
 #[cfg(feature = "v4_5")]
 pub use self::v4_5::*;
 
+#[cfg(feature = "v4_6")]
+mod v4_6;
+#[cfg(feature = "v4_6")]
+pub use self::v4_6::*;
+
+
 include!(concat!(
     env!("OUT_DIR"),
     "/conditional_compilation_macros.rs"
