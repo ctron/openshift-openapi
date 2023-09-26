@@ -42,4 +42,4 @@ v4_6 = [ "k8s-openapi/v1_19" ]
 #k8s-openapi = { git = "https://github.com/Arnavion/k8s-openapi", branch="master" }
 
 [package.metadata.docs.rs]
-features = ["v4_5"]
+features = ["v4_6"]

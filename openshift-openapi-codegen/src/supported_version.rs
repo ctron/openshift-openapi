@@ -3,6 +3,7 @@ pub(crate) const ALL: &[SupportedVersion] = &[
     SupportedVersion::V4_3,
     SupportedVersion::V4_4,
     SupportedVersion::V4_5,
+    SupportedVersion::V4_6,
 ];
 
 #[derive(Clone, Copy, Debug)]
@@ -11,6 +12,7 @@ pub(crate) enum SupportedVersion {
     V4_3,
     V4_4,
     V4_5,
+    V4_6,
 }
 
 impl SupportedVersion {
@@ -20,6 +22,7 @@ impl SupportedVersion {
             SupportedVersion::V4_3 => "v4_3",
             SupportedVersion::V4_4 => "v4_4",
             SupportedVersion::V4_5 => "v4_5",
+            SupportedVersion::V4_6 => "v4_6",
         }
     }
 
@@ -29,6 +32,7 @@ impl SupportedVersion {
             SupportedVersion::V4_3 => "https://raw.githubusercontent.com/openshift/origin/release-4.3/api/swagger-spec/openshift-openapi-spec.json",
             SupportedVersion::V4_4 => "https://raw.githubusercontent.com/openshift/origin/release-4.4/api/swagger-spec/openshift-openapi-spec.json",
             SupportedVersion::V4_5 => "https://raw.githubusercontent.com/openshift/origin/release-4.5/api/swagger-spec/openshift-openapi-spec.json",
+            SupportedVersion::V4_6 => "https://raw.githubusercontent.com/openshift/origin/release-4.6/api/swagger-spec/openshift-openapi-spec.json",
         }
     }
 
@@ -53,6 +57,11 @@ impl SupportedVersion {
                 crate::fixups::openshift::remove_legacy_gvk,
             ],
             SupportedVersion::V4_5 => &[
+                crate::fixups::openshift::connect_options_gvk,
+                crate::fixups::openshift::fix_imagestream_secrets_list,
+                crate::fixups::openshift::remove_legacy_gvk,
+            ],
+            SupportedVersion::V4_6 => &[
                 crate::fixups::openshift::connect_options_gvk,
                 crate::fixups::openshift::fix_imagestream_secrets_list,
                 crate::fixups::openshift::remove_legacy_gvk,
